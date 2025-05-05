@@ -22,40 +22,42 @@ serve(async (req) => {
       throw new Error('Prompt is required');
     }
 
-    // Construct the prompt for Gemini
+    // Gemini için yanıt dilini Türkçe olarak belirten komut ekleme
     const geminiPrompt = `
-      Create an interactive learning simulation about: "${prompt}". 
+      Lütfen yanıtını tamamen Türkçe olarak ver.
       
-      Format your response as a JSON object with the following structure:
+      Şu konu hakkında etkileşimli bir öğrenme simülasyonu oluştur: "${prompt}". 
+      
+      Yanıtını aşağıdaki yapıda bir JSON nesnesi olarak formatla:
       {
-        "title": "An engaging title for the simulation",
-        "scenario": "A first-person scenario that puts the learner in the middle of the concept",
-        "steps": ["Step 1 description", "Step 2 description", ...],
-        "explanation": "A clear, concise explanation of the concept",
-        "questions": ["Reflection question 1", "Reflection question 2", ...],
+        "title": "Simülasyon için ilgi çekici bir başlık",
+        "scenario": "Öğrenciyi konunun merkezine koyan birinci şahıs senaryosu",
+        "steps": ["1. adımın açıklaması", "2. adımın açıklaması", ...],
+        "explanation": "Konunun net ve özlü bir açıklaması",
+        "questions": ["Düşündürücü soru 1", "Düşündürücü soru 2", ...],
         "interactiveElements": [
           {
-            "id": "unique-id",
+            "id": "benzersiz-id",
             "type": "slider|button|toggle|input",
-            "label": "User-friendly label",
-            "description": "What this interactive element does",
-            "min": 0, (optional, for sliders)
-            "max": 100, (optional, for sliders)
-            "defaultValue": 50, (optional)
-            "options": ["option1", "option2"], (optional, for select inputs)
-            "affects": "what-this-changes",
+            "label": "Kullanıcı dostu etiket",
+            "description": "Bu etkileşimli öğenin ne işe yaradığı",
+            "min": 0, (isteğe bağlı, kaydırıcılar için)
+            "max": 100, (isteğe bağlı, kaydırıcılar için)
+            "defaultValue": 50, (isteğe bağlı)
+            "options": ["seçenek1", "seçenek2"], (isteğe bağlı, seçim girişleri için)
+            "affects": "bu-neyi-değiştirir",
             "feedback": {
-              "0": "Feedback for minimum value",
-              "25": "Feedback for low value",
-              "50": "Feedback for medium value",
-              "75": "Feedback for high value",
-              "100": "Feedback for maximum value"
+              "0": "Minimum değer için geri bildirim",
+              "25": "Düşük değer için geri bildirim",
+              "50": "Orta değer için geri bildirim",
+              "75": "Yüksek değer için geri bildirim",
+              "100": "Maksimum değer için geri bildirim"
             }
           }
         ]
       }
       
-      Make sure the interactive elements truly help the user understand the concept by allowing them to manipulate key variables and see immediate feedback. Include at least 2 interactive elements.
+      Etkileşimli öğelerin kullanıcının kavramı anlamasına gerçekten yardımcı olduğuna emin ol, temel değişkenleri değiştirmelerine ve anında geri bildirim görmelerine izin vererek. En az 2 etkileşimli öğe dahil et. Simülasyon içerisinde kesinlikle sadece Türkçe dil kullan, hiçbir İngilizce kelime veya ifade olmasın.
     `;
 
     const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent', {

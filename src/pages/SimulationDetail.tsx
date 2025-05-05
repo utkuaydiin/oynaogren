@@ -29,6 +29,7 @@ const SimulationDetail = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0);
+  const [userAnswers, setUserAnswers] = useState<{[key: string]: string}>({});
 
   useEffect(() => {
     const fetchSimulation = async () => {
@@ -50,12 +51,20 @@ const SimulationDetail = () => {
         
         // Soruları oluştur
         if (simulationData.questions && simulationData.questions.length > 0) {
-          const generatedQuestions = simulationData.questions.map(q => ({
-            question: q,
-            correctAnswer: generateAnswer(q),
-            explanation: generateExplanation(q, simulationData.explanation)
-          }));
-          setQuestions(generatedQuestions);
+          // Matematiksel türev soruları için özel sorular oluşturalım
+          if (simulationData.title.toLowerCase().includes("türev") || 
+              simulationData.explanation.toLowerCase().includes("türev")) {
+            const derivativeQuestions = generateDerivativeQuestions();
+            setQuestions(derivativeQuestions);
+          } else {
+            // Diğer konular için normal soru üretimi
+            const generatedQuestions = simulationData.questions.map(q => ({
+              question: q,
+              correctAnswer: generateAnswer(q),
+              explanation: generateExplanation(q, simulationData.explanation)
+            }));
+            setQuestions(generatedQuestions);
+          }
         }
       } catch (error: any) {
         toast({
@@ -72,10 +81,36 @@ const SimulationDetail = () => {
     fetchSimulation();
   }, [id, navigate, toast]);
 
-  // Soru için basit bir cevap üretme fonksiyonu
+  // Türev soruları oluşturan fonksiyon
+  const generateDerivativeQuestions = (): Question[] => {
+    return [
+      {
+        question: "x^2+5 fonksiyonunun türevi nedir?",
+        correctAnswer: "2x",
+        explanation: "f(x) = x^2+5 fonksiyonunun türevi, x^n türevi için kural olan n.x^(n-1) formülünü kullanarak hesaplanır. Burada n=2 olduğu için, 2.x^(2-1) = 2x olur. Sabit terim olan 5'in türevi 0 olduğu için sonuç 2x'tir."
+      },
+      {
+        question: "3x^3-2x+7 fonksiyonunun türevi nedir?",
+        correctAnswer: "9x^2-2",
+        explanation: "f(x) = 3x^3-2x+7 fonksiyonunun türevi için terim terim türev alırız. 3x^3'ün türevi 3.3x^2 = 9x^2, -2x'in türevi -2, ve sabit terim olan 7'nin türevi 0'dır. Sonuç: 9x^2-2"
+      },
+      {
+        question: "sin(x) fonksiyonunun türevi nedir?",
+        correctAnswer: "cos(x)",
+        explanation: "sin(x) fonksiyonunun türevi cos(x)'tir. Bu, trigonometrik fonksiyonların türev kurallarından gelir."
+      },
+      {
+        question: "x.e^x fonksiyonunun türevi nedir?",
+        correctAnswer: "e^x+x.e^x",
+        explanation: "Bu türevi çarpım kuralı kullanarak hesaplamamız gerekir. f(x)=x ve g(x)=e^x için, (f.g)' = f'.g + f.g' formülünü kullanırız. Burada f'=1 ve g'=e^x olduğundan, sonuç 1.e^x + x.e^x = e^x(1+x) = e^x+x.e^x olur."
+      }
+    ];
+  };
+
+  // Soru için basit bir cevap üretme fonksiyonu (Türkçe)
   const generateAnswer = (question: string) => {
     // Bu kısım gerçek bir uygulamada daha gelişmiş olmalı
-    // Şu an için soruya dayanarak basit bir cevap üretiyoruz
+    // Şu an için soruya dayanarak basit bir Türkçe cevap üretiyoruz
     if (question.includes("neden") || question.includes("niçin")) {
       return "Bilimsel prensiplere göre";
     } else if (question.includes("nasıl")) {
@@ -87,7 +122,7 @@ const SimulationDetail = () => {
     }
   };
   
-  // Soru için açıklama üreten fonksiyon
+  // Soru için açıklama üreten fonksiyon (Türkçe)
   const generateExplanation = (question: string, simExplanation: string) => {
     // Simülasyon açıklamasından bir özet çıkarmaya çalışalım
     const sentences = simExplanation.split('. ');
@@ -111,6 +146,13 @@ const SimulationDetail = () => {
     if (activeQuestionIndex > 0) {
       setActiveQuestionIndex(activeQuestionIndex - 1);
     }
+  };
+
+  const handleUserAnswer = (questionIndex: number, answer: string) => {
+    setUserAnswers({
+      ...userAnswers,
+      [questionIndex]: answer
+    });
   };
 
   if (isLoading) {
@@ -185,7 +227,13 @@ const SimulationDetail = () => {
               
               {simulation.interactiveElements && simulation.interactiveElements.length > 0 && (
                 <>
-                  <InteractiveElements elements={simulation.interactiveElements} />
+                  <div className="mb-6">
+                    <h4 className="text-lg font-semibold mb-3">Etkileşimli Öğeler</h4>
+                    <p className="text-slate-600 mb-4">
+                      Farklı değişkenlerin sonucu nasıl etkilediğini görmek için bu kontrollerle deney yapın.
+                    </p>
+                    <InteractiveElements elements={simulation.interactiveElements} />
+                  </div>
                   <Separator className="my-6" />
                 </>
               )}
@@ -224,6 +272,7 @@ const SimulationDetail = () => {
                       [activeQuestion.correctAnswer.toLowerCase()]: "Doğru! " + activeQuestion.explanation,
                       'default': "Yanlış cevap. Tekrar deneyin veya cevabı görüntülemek için aşağıdaki düğmeye tıklayın."
                     }}
+                    onSubmit={(value) => handleUserAnswer(activeQuestionIndex, value)}
                   />
                   
                   <div className="flex justify-between mt-4">

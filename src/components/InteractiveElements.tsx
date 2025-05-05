@@ -17,11 +17,6 @@ const InteractiveElements: React.FC<InteractiveElementsProps> = ({ elements }) =
   
   return (
     <div className="space-y-6">
-      <h3 className="text-lg font-semibold">Etkileşimli Öğeler</h3>
-      <p className="text-slate-600 mb-4">
-        Farklı değişkenlerin sonucu nasıl etkilediğini görmek için bu kontrollerle deney yapın.
-      </p>
-      
       <div className="space-y-4">
         {elements.map((element) => {
           switch (element.type) {
