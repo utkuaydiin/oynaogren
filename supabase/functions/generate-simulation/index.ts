@@ -60,7 +60,7 @@ serve(async (req) => {
       TÜM ÇIKTIYI TÜRKÇE OLARAK SAĞLA. Başlık, açıklamalar, sorular ve tüm metin Türkçe olmalıdır.
     `;
 
-    const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent', {
+    const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-latest:generateContent', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
