@@ -23,44 +23,21 @@ const InteractiveInput: React.FC<InteractiveInputProps> = ({
   const [value, setValue] = useState(defaultValue);
   const [currentFeedback, setCurrentFeedback] = useState('');
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
-  const [showAnswerClicked, setShowAnswerClicked] = useState(false);
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     // Cevabı kontrol et
-    // Önce tam eşleşme kontrol et
-    if (feedback[value.toLowerCase().trim()]) {
-      setCurrentFeedback(feedback[value.toLowerCase().trim()]);
-      setIsCorrect(
-        feedback[value.toLowerCase().trim()].includes('Doğru') || 
-        feedback[value.toLowerCase().trim()].includes('doğru') || 
-        (!feedback[value.toLowerCase().trim()].includes('Yanlış') && 
-         !feedback[value.toLowerCase().trim()].includes('yanlış'))
-      );
-    } 
-    // Doğru cevapların olduğu bir listede kontrol et (bazı matematik soruları için alternatif yazımları desteklemek için)
-    else {
-      const correctAnswers = Object.keys(feedback).filter(key => 
-        feedback[key].includes('Doğru') || 
-        feedback[key].includes('doğru') ||
-        (!feedback[key].includes('Yanlış') && !feedback[key].includes('yanlış'))
-      );
-      
-      // Kullanıcının yanıtını doğru yanıtlarla karşılaştır (boşlukları ve büyük/küçük harfleri göz ardı ederek)
-      const isAnswerCorrect = correctAnswers.some(answer => 
-        value.toLowerCase().trim() === answer.toLowerCase().trim() ||
-        value.toLowerCase().trim().replace(/\s+/g, '') === answer.toLowerCase().trim().replace(/\s+/g, '')
-      );
-      
-      if (isAnswerCorrect && correctAnswers.length > 0) {
-        setCurrentFeedback(feedback[correctAnswers[0]]);
-        setIsCorrect(true);
-      } else {
-        // Eşleşme yoksa varsayılan geri bildirim
-        setCurrentFeedback(feedback['default'] || 'Bu yanıtınız üzerine düşünelim...');
-        setIsCorrect(false);
-      }
+    if (feedback[value.toLowerCase()]) {
+      setCurrentFeedback(feedback[value.toLowerCase()]);
+      setIsCorrect(feedback[value.toLowerCase()].includes('Doğru') || 
+                   feedback[value.toLowerCase()].includes('doğru') || 
+                   !feedback[value.toLowerCase()].includes('Yanlış') && 
+                   !feedback[value.toLowerCase()].includes('yanlış'));
+    } else {
+      // Eşleşme yoksa varsayılan geri bildirim
+      setCurrentFeedback(feedback['default'] || 'Başka bir cevap deneyin.');
+      setIsCorrect(false);
     }
     
     if (onSubmit) {
@@ -69,7 +46,6 @@ const InteractiveInput: React.FC<InteractiveInputProps> = ({
   };
 
   const showAnswer = () => {
-    setShowAnswerClicked(true);
     // Doğru cevabı bul (genellikle "correct" veya "doğru" anahtarıyla saklanır)
     const correctAnswer = Object.entries(feedback).find(([_, value]) => 
       value.includes('Doğru') || value.includes('doğru')
@@ -97,7 +73,7 @@ const InteractiveInput: React.FC<InteractiveInputProps> = ({
           value={value}
           onChange={(e) => setValue(e.target.value)}
           className="flex-1"
-          placeholder="Yanıtınızı buraya yazın..."
+          placeholder="Cevabınızı buraya yazın..."
         />
         <Button type="submit">Gönder</Button>
       </form>
@@ -106,11 +82,11 @@ const InteractiveInput: React.FC<InteractiveInputProps> = ({
         <div className={`mt-3 p-3 border rounded text-sm ${
           isCorrect === null ? 'bg-white border-slate-200 text-slate-700' : 
           isCorrect ? 'bg-green-50 border-green-200 text-green-700' : 
-          'bg-blue-50 border-blue-200 text-blue-700'
+          'bg-red-50 border-red-200 text-red-700'
         }`}>
           {currentFeedback}
           
-          {!isCorrect && isCorrect !== null && !showAnswerClicked && (
+          {!isCorrect && isCorrect !== null && (
             <div className="mt-2">
               <Button 
                 variant="outline" 

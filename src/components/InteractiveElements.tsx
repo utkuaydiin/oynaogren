@@ -1,6 +1,9 @@
 
 import React from 'react';
-import InteractiveQuestion from './interactive/InteractiveQuestion';
+import InteractiveSlider from './interactive/InteractiveSlider';
+import InteractiveToggle from './interactive/InteractiveToggle';
+import InteractiveButton from './interactive/InteractiveButton';
+import InteractiveInput from './interactive/InteractiveInput';
 import { InteractiveElement } from '@/services/geminiService';
 
 interface InteractiveElementsProps {
@@ -12,32 +15,65 @@ const InteractiveElements: React.FC<InteractiveElementsProps> = ({ elements }) =
     return null;
   }
   
-  // Filter to only include elements that have question/description and answer/feedback properties
-  const questions = elements.filter(el => {
-    // Check if the element has both a question and an answer field
-    return (
-      (el.question || el.label || el.description) && 
-      (el.answer || el.correctAnswer || el.feedback)
-    );
-  });
-  
-  // If no questions after filtering, show nothing
-  if (questions.length === 0) {
-    return null;
-  }
-  
   return (
     <div className="space-y-6">
+      <h3 className="text-lg font-semibold">Etkileşimli Öğeler</h3>
+      <p className="text-slate-600 mb-4">
+        Farklı değişkenlerin sonucu nasıl etkilediğini görmek için bu kontrollerle deney yapın.
+      </p>
+      
       <div className="space-y-4">
-        {questions.map((element) => (
-          <InteractiveQuestion
-            key={element.id}
-            id={element.id}
-            question={element.question || element.label || element.description || ''}
-            answer={element.answer || element.correctAnswer || element.feedback?.['100'] || ''}
-            explanation={element.explanation || ''}
-          />
-        ))}
+        {elements.map((element) => {
+          switch (element.type) {
+            case 'slider':
+              return (
+                <InteractiveSlider
+                  key={element.id}
+                  id={element.id}
+                  label={element.label}
+                  description={element.description}
+                  min={element.min || 0}
+                  max={element.max || 100}
+                  defaultValue={Number(element.defaultValue) || 50}
+                  feedback={element.feedback || {}}
+                />
+              );
+            case 'toggle':
+              return (
+                <InteractiveToggle
+                  key={element.id}
+                  id={element.id}
+                  label={element.label}
+                  description={element.description}
+                  defaultValue={Boolean(element.defaultValue)}
+                  feedback={element.feedback as { 'true': string, 'false': string } || { 'true': 'Açık', 'false': 'Kapalı' }}
+                />
+              );
+            case 'button':
+              return (
+                <InteractiveButton
+                  key={element.id}
+                  id={element.id}
+                  label={element.label}
+                  description={element.description}
+                  feedback={element.feedback ? Object.values(element.feedback)[0] : ''}
+                />
+              );
+            case 'input':
+              return (
+                <InteractiveInput
+                  key={element.id}
+                  id={element.id}
+                  label={element.label}
+                  description={element.description}
+                  feedback={element.feedback || {}}
+                  defaultValue={String(element.defaultValue || '')}
+                />
+              );
+            default:
+              return null;
+          }
+        })}
       </div>
     </div>
   );

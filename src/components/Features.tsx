@@ -5,23 +5,23 @@ import { Book, Brain, Lightbulb, Play } from 'lucide-react';
 
 const features = [
   {
-    title: 'Deneyimsel Öğrenme',
-    description: 'Soyut kavramları somutlaştıran etkileşimli simülasyonlar aracılığıyla yaparak öğrenin.',
+    title: 'Experiential Learning',
+    description: 'Learn by doing through interactive simulations that bring abstract concepts to life.',
     icon: <Play className="h-6 w-6 text-primary" />,
   },
   {
-    title: 'Özel Senaryolar',
-    description: 'Anlamak istediğiniz herhangi bir konu için kişiselleştirilmiş öğrenme simülasyonları oluşturun.',
+    title: 'Custom Scenarios',
+    description: 'Generate personalized learning simulations for any topic you want to understand.',
     icon: <Lightbulb className="h-6 w-6 text-primary" />,
   },
   {
-    title: 'Bilgi Kalıcılığı',
-    description: 'Araştırmalar, sadece okuduğumuzun %10\'unu hatırlarken, deneyimlediğimizin %90\'ını hatırladığımızı gösteriyor.',
+    title: 'Knowledge Retention',
+    description: 'Research shows we retain up to 90% of what we experience versus just 10% of what we read.',
     icon: <Brain className="h-6 w-6 text-primary" />,
   },
   {
-    title: 'Öğrenme Kütüphanesi',
-    description: 'Çeşitli konularda önceden oluşturulmuş geniş bir simülasyon koleksiyonuna erişin.',
+    title: 'Learning Library',
+    description: 'Access a growing collection of pre-built simulations across various subjects.',
     icon: <Book className="h-6 w-6 text-primary" />,
   },
 ];
@@ -32,9 +32,9 @@ const Features = () => {
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex flex-col items-center justify-center space-y-4 text-center mb-10">
           <div>
-            <h2 className="text-3xl font-bold tracking-tight">Neden Simülasyon ile Öğrenmeliyiz?</h2>
+            <h2 className="text-3xl font-bold tracking-tight">Why Learn Through Simulation?</h2>
             <p className="mt-4 text-lg text-gray-500">
-              OynaÖğren, karmaşık konuları anlamanızı kolaylaştıran sürükleyici deneyimler yaratarak öğrenme şeklinizi dönüştürür.
+              LifeSim transforms how you learn by creating immersive experiences that make complex topics easy to understand.
             </p>
           </div>
         </div>

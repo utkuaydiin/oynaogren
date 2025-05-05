@@ -26,15 +26,15 @@ const InteractiveSlider: React.FC<InteractiveSliderProps> = ({
   const [value, setValue] = useState<number>(defaultValue);
   const [currentFeedback, setCurrentFeedback] = useState<string>("");
   
-  // Değere göre hangi geri bildirimin gösterileceğini belirle
+  // Determine which feedback to show based on current value
   useEffect(() => {
-    // Değeri yüzdeliğe dönüştür
+    // Convert the value to a percentage for feedback lookup
     const valuePercentage = Math.round(((value - min) / (max - min)) * 100);
     
-    // Geri bildirim eşik değerlerini tanımla
+    // Define threshold ranges for feedback
     const thresholds = Object.keys(feedback).map(Number).sort((a, b) => a - b);
     
-    // En yakın eşik değerini bul
+    // Find the closest threshold
     let closestThreshold = thresholds[0];
     for (const threshold of thresholds) {
       if (Math.abs(threshold - valuePercentage) < Math.abs(closestThreshold - valuePercentage)) {
