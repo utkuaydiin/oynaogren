@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -53,6 +52,30 @@ const derivativeQuestions = [
     question: "sin(x) fonksiyonunun türevi nedir?",
     answer: "cos(x)",
     explanation: "Trigonometrik fonksiyonların türev kurallarına göre, sin(x) fonksiyonunun türevi cos(x)'tir."
+  },
+  {
+    id: "derivative-4",
+    question: "e^x fonksiyonunun türevi nedir?",
+    answer: "e^x",
+    explanation: "e^x fonksiyonu, türevi kendisi olan özel bir fonksiyondur. Bu nedenle, f(x) = e^x için f'(x) = e^x olur."
+  },
+  {
+    id: "derivative-5",
+    question: "ln(x) fonksiyonunun türevi nedir?",
+    answer: "1/x",
+    explanation: "Doğal logaritma fonksiyonu ln(x)'in türevi 1/x'tir. Bu, logaritmik fonksiyonların türev kurallarından gelir."
+  },
+  {
+    id: "derivative-6",
+    question: "cos(x) fonksiyonunun türevi nedir?",
+    answer: "-sin(x)",
+    explanation: "Kosinüs fonksiyonunun türevi, negatif sinüs fonksiyonudur. Yani, f(x) = cos(x) için f'(x) = -sin(x) olur."
+  },
+  {
+    id: "derivative-7",
+    question: "2x^3 - 5x^2 + 4x - 7 fonksiyonunun türevi nedir?",
+    answer: "6x^2 - 10x + 4",
+    explanation: "Polinom fonksiyonlarının türevini almak için her terimin türevini ayrı ayrı hesaplarız. 2x^3'ün türevi 6x^2, -5x^2'nin türevi -10x, 4x'in türevi 4 ve sabit terim -7'nin türevi 0'dır. Sonuç: 6x^2 - 10x + 4"
   }
 ];
 
@@ -253,7 +276,7 @@ const SimulationDisplay: React.FC<SimulationDisplayProps> = ({ simulation, isLoa
             <div className="mb-6">
               <h4 className="text-lg font-semibold mb-3">Türev Alıştırmaları</h4>
               <p className="text-slate-600 mb-4">
-                Aşağıdaki soruları yanıtlayarak türev bilginizi test edin. Cevabınızı yazıp değerlendirilmesini isteyin veya doğrudan yanıtı görün.
+                Aşağıdaki soruların yanıtlarını görebilmek için "Doğru Yanıtı Göster" butonuna tıklayın.
               </p>
               
               <div className="space-y-4">
@@ -264,9 +287,6 @@ const SimulationDisplay: React.FC<SimulationDisplayProps> = ({ simulation, isLoa
                     question={question.question}
                     answer={question.answer}
                     explanation={question.explanation}
-                    onUserAnswer={
-                      (questionText, userAnswer) => handleUserAnswer(question.id, questionText, userAnswer)
-                    }
                   />
                 ))}
               </div>

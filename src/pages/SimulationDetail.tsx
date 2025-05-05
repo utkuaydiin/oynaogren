@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -118,6 +117,18 @@ const SimulationDetail = () => {
         question: "x.e^x fonksiyonunun türevi nedir?",
         correctAnswer: "e^x+x.e^x",
         explanation: "Bu türevi çarpım kuralı kullanarak hesaplamamız gerekir. f(x)=x ve g(x)=e^x için, (f.g)' = f'.g + f.g' formülünü kullanırız. Burada f'=1 ve g'=e^x olduğundan, sonuç 1.e^x + x.e^x = e^x(1+x) = e^x+x.e^x olur."
+      },
+      {
+        id: "derivative-5",
+        question: "ln(x) fonksiyonunun türevi nedir?",
+        correctAnswer: "1/x",
+        explanation: "Doğal logaritma fonksiyonu ln(x)'in türevi 1/x'tir. Bu önemli bir temel türev kuralıdır."
+      },
+      {
+        id: "derivative-6",
+        question: "tan(x) fonksiyonunun türevi nedir?",
+        correctAnswer: "sec^2(x)",
+        explanation: "Tanjant fonksiyonunun türevi, sekant fonksiyonunun karesidir: d/dx(tan(x)) = sec^2(x)"
       }
     ];
   };
@@ -136,13 +147,25 @@ const SimulationDetail = () => {
         question: "Türev alma işleminde zincir kuralı ne için kullanılır?",
         correctAnswer: "Bileşik fonksiyonların türevini almak için",
         explanation: "Zincir kuralı, iç içe fonksiyonlardan oluşan bileşik fonksiyonların türevini almayı sağlayan temel bir kuraldır. f(g(x)) şeklindeki bir fonksiyonun türevi, f'(g(x)) × g'(x) olarak hesaplanır."
+      },
+      {
+        id: "practice-3",
+        question: "Bir fonksiyonun ikinci türevi ne anlama gelir?",
+        correctAnswer: "Değişim oranının değişim oranını",
+        explanation: "Bir fonksiyonun ikinci türevi, birinci türevin türevi demektir. Bu, değişim oranının kendisinin nasıl değiştiğini gösterir ve fonksiyonun konkavlığı hakkında bilgi verir."
+      },
+      {
+        id: "practice-4",
+        question: "Türev, fizik biliminde neyi temsil eder?",
+        correctAnswer: "Anlık hızı veya ivmeyi",
+        explanation: "Fizikte, konum fonksiyonunun türevi anlık hızı, hız fonksiyonunun türevi ise ivmeyi verir. Türev, fiziksel büyüklüklerin anlık değişim oranlarını hesaplamak için kullanılır."
       }
     ];
   };
 
   // Soru için basit bir cevap üretme fonksiyonu (Türkçe)
   const generateAnswer = (question: string) => {
-    // Bu kısım gerçek bir uygulamada daha gelişmiş olmalı
+    // Bu kısım gerçek bir uygulamaada daha gelişmiş olmalı
     // Şu an için soruya dayanarak basit bir Türkçe cevap üretiyoruz
     if (question.includes("neden") || question.includes("niçin")) {
       return "Bilimsel prensiplere göre";
@@ -343,55 +366,19 @@ const SimulationDetail = () => {
         {questions.length > 0 && (
           <Card className="w-full max-w-3xl mx-auto overflow-hidden">
             <CardContent className="p-6">
-              <h4 className="text-lg font-semibold mb-4">Soru {activeQuestionIndex + 1}/{questions.length}</h4>
+              <h4 className="text-lg font-semibold mb-4">Türev Alıştırmaları</h4>
               
               <div className="mb-6">
-                <p className="text-slate-800 text-lg mb-4">{activeQuestion.question}</p>
-                
-                <div className="space-y-4 p-4 bg-slate-50 rounded-lg">
-                  <div className="space-y-1">
-                    <label className="text-base font-medium text-slate-900">
-                      Anlayışınızı Gösterin
-                    </label>
-                    <p className="text-sm text-slate-500">
-                      Bu konudaki anlayışınızı göstermek için cevabınızı yazın. Size detaylı geri bildirim sağlayacağız.
-                    </p>
-                  </div>
-                  
-                  <InteractiveInput
-                    id={`question-${activeQuestionIndex}`}
-                    label=""
-                    description=""
-                    feedback={{
-                      [activeQuestion.correctAnswer.toLowerCase()]: "Doğru! " + activeQuestion.explanation,
-                      'default': "Yanıtınız değerlendiriliyor..."
-                    }}
-                    onSubmit={(value) => handleUserAnswer(activeQuestionIndex, value)}
-                  />
-                  
-                  {activeResponse && (
-                    <div className="mt-3 p-3 border rounded-md border-blue-200 bg-blue-50">
-                      <p className="text-sm text-blue-800 font-medium">Yanıtınızın Değerlendirmesi:</p>
-                      <p className="text-sm text-blue-700 mt-1">{activeResponse.feedback}</p>
-                    </div>
-                  )}
-                  
-                  <div className="flex justify-between mt-4">
-                    <Button 
-                      variant="outline" 
-                      onClick={previousQuestion}
-                      disabled={activeQuestionIndex === 0}
-                    >
-                      Önceki Soru
-                    </Button>
-                    
-                    <Button 
-                      onClick={nextQuestion}
-                      disabled={activeQuestionIndex === questions.length - 1}
-                    >
-                      Sonraki Soru
-                    </Button>
-                  </div>
+                <div className="space-y-4">
+                  {questions.map((question) => (
+                    <InteractiveQuestion 
+                      key={question.id}
+                      id={question.id}
+                      question={question.question}
+                      answer={question.correctAnswer}
+                      explanation={question.explanation}
+                    />
+                  ))}
                 </div>
               </div>
             </CardContent>
