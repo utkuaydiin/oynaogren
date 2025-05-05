@@ -21,7 +21,7 @@ export interface InteractiveElement {
   options?: string[];
   affects?: string;
   feedback?: {[key: string]: string};
-  // Özel sorular için alanlar
+  // Fields for questions
   question?: string;
   answer?: string;
   correctAnswer?: string;
@@ -38,6 +38,29 @@ export async function generateSimulationWithGemini(prompt: string): Promise<Simu
     if (error) {
       console.error("Error calling Gemini API:", error);
       throw new Error("Failed to generate simulation");
+    }
+
+    // Ensure interactiveElements is properly formed and has the correct structure
+    if (data && data.interactiveElements) {
+      // Normalize the interactive elements to ensure they have the correct structure
+      data.interactiveElements = data.interactiveElements.map((el, index) => {
+        // Ensure each element has an id
+        const id = el.id || `element-${index}`;
+        
+        // For question type elements, ensure they have the required fields
+        if (el.type === 'question' || el.question) {
+          return {
+            id,
+            type: 'question',
+            question: el.question || el.label || el.description || '',
+            answer: el.answer || el.correctAnswer || el.feedback?.['100'] || '',
+            explanation: el.explanation || ''
+          };
+        }
+        
+        // Return the element with at least an id
+        return { ...el, id };
+      });
     }
 
     return data;
@@ -125,23 +148,23 @@ function getDefaultSimulation(prompt: string): SimulationData {
       {
         id: "genel-soru-1",
         type: "question",
-        question: "Öğrenme sürecinde aktif katılımın önemi nedir?",
-        answer: "Aktif katılım, bilginin daha iyi hatırlanmasını ve anlaşılmasını sağlar",
-        explanation: "Aktif öğrenme, öğrencilerin bilgiyi sadece pasif olarak almak yerine, düşünme, sorgulama ve uygulama süreçlerine dahil olmalarını içerir. Bu, daha derin anlama ve daha uzun süreli hafızaya alınmasını sağlar."
+        question: `${prompt} konusunda en önemli temel kavramlar nelerdir?`,
+        answer: "Konunun kapsamına göre değişir; temel ilkeler, anahtar terimler ve pratik uygulamalar.",
+        explanation: `${prompt} konusunu anlamak için öncelikle temel kavramları, prensipleri ve aralarındaki ilişkileri incelemek gerekir.`
       },
       {
         id: "genel-soru-2",
         type: "question",
-        question: "Simülasyonların eğitimdeki rolü nedir?",
-        answer: "Gerçek dünya deneyimlerini güvenli ve kontrollü bir ortamda sunmak",
-        explanation: "Simülasyonlar, gerçek durumları tekrar tekrar deneyimleme, hata yapma ve bunlardan öğrenme fırsatı sağlar. Tehlikeli, pahalı veya erişilemeyen durumları güvenli bir şekilde deneyimlemeyi mümkün kılar."
+        question: `${prompt} konusunda sık yapılan hatalar nelerdir?`,
+        answer: "Temel kavramları yanlış anlama, örnekleri genelleme ve uygulamada kritik adımları atlama.",
+        explanation: `${prompt} öğrenirken, teorik bilgileri pratiğe dökme aşamasında bazı hatalar yapılabilir. Bu hatalardan kaçınmak için, kavramları adım adım öğrenmek ve bol pratik yapmak önemlidir.`
       },
       {
         id: "genel-soru-3",
         type: "question",
-        question: "Etkileşimli öğrenme ile geleneksel öğrenme arasındaki temel fark nedir?",
-        answer: "Öğrencinin pasif alıcı yerine aktif katılımcı olması",
-        explanation: "Geleneksel öğrenmede öğrenci genellikle pasif bir bilgi alıcısıdır. Etkileşimli öğrenmede ise öğrenci, kendi öğrenme sürecinde aktif rol alır, sorular sorar, deneyler yapar ve keşifler gerçekleştirir."
+        question: `${prompt} konusu günlük hayatta nasıl uygulanır?`,
+        answer: "Günlük problemleri çözmek, daha iyi kararlar vermek ve süreçleri optimize etmek için kullanılabilir.",
+        explanation: `${prompt} konusu teorik bilginin ötesinde, pratik uygulamaları ile günlük hayatımızı kolaylaştırabilir. Öğrendiğiniz konseptleri farklı durumlara adapte ederek faydalanabilirsiniz.`
       }
     ]
   };
