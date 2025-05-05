@@ -3,15 +3,11 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import InteractiveElements from './InteractiveElements';
+import { SimulationData } from '@/services/geminiService';
 
 interface SimulationDisplayProps {
-  simulation: {
-    title: string;
-    scenario: string;
-    steps: string[];
-    explanation: string;
-    questions: string[];
-  } | null;
+  simulation: SimulationData | null;
   isLoading: boolean;
 }
 
@@ -78,6 +74,13 @@ const SimulationDisplay: React.FC<SimulationDisplayProps> = ({ simulation, isLoa
           </div>
           
           <Separator className="my-6" />
+          
+          {simulation.interactiveElements && simulation.interactiveElements.length > 0 && (
+            <>
+              <InteractiveElements elements={simulation.interactiveElements} />
+              <Separator className="my-6" />
+            </>
+          )}
           
           <div className="mb-6">
             <h4 className="text-lg font-semibold mb-2">Explanation</h4>
