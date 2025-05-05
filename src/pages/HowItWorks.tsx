@@ -11,16 +11,16 @@ const HowItWorks = () => {
       
       <main className="flex-grow py-12">
         <div className="container mx-auto px-4">
-          <h1 className="text-4xl font-bold text-center mb-12">How LifeSim Works</h1>
+          <h1 className="text-4xl font-bold text-center mb-12">OynaÖğren Nasıl Çalışır?</h1>
           
           <div className="max-w-3xl mx-auto space-y-12">
             <section className="space-y-4">
-              <h2 className="text-2xl font-semibold text-primary-700">The Science of Experiential Learning</h2>
+              <h2 className="text-2xl font-semibold text-primary-700">Deneyimsel Öğrenmenin Bilimi</h2>
               <p className="text-slate-600">
-                Research consistently shows that we learn best by doing. When we actively engage 
-                with material through experience, we form stronger neural connections that lead 
-                to better understanding and retention. LifeSim leverages this principle by creating 
-                immersive simulations that let you experience concepts firsthand.
+                Araştırmalar, en iyi yaparak öğrendiğimizi tutarlı bir şekilde göstermektedir. Materyal ile 
+                deneyim yoluyla aktif olarak etkileşime girdiğimizde, daha iyi anlama ve akılda tutmaya yol açan 
+                daha güçlü sinirsel bağlantılar oluşturuyoruz. OynaÖğren, kavramları ilk elden deneyimlemenizi 
+                sağlayan etkileyici simülasyonlar oluşturarak bu ilkeden yararlanır.
               </p>
             </section>
             
@@ -28,9 +28,9 @@ const HowItWorks = () => {
               <Card>
                 <CardContent className="pt-6">
                   <div className="text-3xl font-bold text-primary mb-2">1</div>
-                  <h3 className="text-xl font-medium mb-2">Enter Your Topic</h3>
+                  <h3 className="text-xl font-medium mb-2">Konunuzu Girin</h3>
                   <p className="text-slate-500">
-                    Tell us what you want to learn. Be specific for the best results.
+                    Bize ne öğrenmek istediğinizi söyleyin. En iyi sonuçlar için spesifik olun.
                   </p>
                 </CardContent>
               </Card>
@@ -38,9 +38,9 @@ const HowItWorks = () => {
               <Card>
                 <CardContent className="pt-6">
                   <div className="text-3xl font-bold text-primary mb-2">2</div>
-                  <h3 className="text-xl font-medium mb-2">AI Generates Simulation</h3>
+                  <h3 className="text-xl font-medium mb-2">Yapay Zeka Simülasyon Üretir</h3>
                   <p className="text-slate-500">
-                    Our AI creates a custom simulation scenario tailored to your learning needs.
+                    Yapay zekamız, öğrenme ihtiyaçlarınıza göre özelleştirilmiş bir simülasyon senaryosu oluşturur.
                   </p>
                 </CardContent>
               </Card>
@@ -48,20 +48,20 @@ const HowItWorks = () => {
               <Card>
                 <CardContent className="pt-6">
                   <div className="text-3xl font-bold text-primary mb-2">3</div>
-                  <h3 className="text-xl font-medium mb-2">Experience & Learn</h3>
+                  <h3 className="text-xl font-medium mb-2">Deneyimleyin ve Öğrenin</h3>
                   <p className="text-slate-500">
-                    Follow the simulation steps and answer reflection questions to solidify your understanding.
+                    Simülasyon adımlarını takip edin ve anlayışınızı pekiştirmek için yansıtma sorularını yanıtlayın.
                   </p>
                 </CardContent>
               </Card>
             </div>
             
             <section className="space-y-4">
-              <h2 className="text-2xl font-semibold text-primary-700">The Technology Behind LifeSim</h2>
+              <h2 className="text-2xl font-semibold text-primary-700">OynaÖğren'in Arkasındaki Teknoloji</h2>
               <p className="text-slate-600">
-                LifeSim uses Gemini 2.0 Flash, a state-of-the-art AI model specifically trained to generate 
-                educational simulations. This model understands complex topics across various domains and 
-                knows how to create scenarios that bring abstract concepts to life.
+                OynaÖğren, özellikle eğitim simülasyonları üretmek için eğitilmiş en gelişmiş yapay zeka modelini kullanır. 
+                Bu model, çeşitli alanlardaki karmaşık konuları anlar ve soyut kavramları hayata geçiren senaryolar 
+                oluşturmayı bilir.
               </p>
             </section>
           </div>

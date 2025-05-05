@@ -8,40 +8,40 @@ import { useNavigate } from 'react-router-dom';
 
 const exampleSimulations = [
   {
-    title: "Photosynthesis: From Sunlight to Sugar",
-    description: "Experience the journey of a photon as it helps transform CO2 and water into glucose and oxygen.",
-    category: "Biology",
-    difficulty: "Beginner",
+    title: "Fotosentez: Güneş Işığından Şekere",
+    description: "Bir fotonun CO2 ve suyu glikoz ve oksijene dönüştürmesine yardımcı olduğu yolculuğu deneyimleyin.",
+    category: "Biyoloji",
+    difficulty: "Başlangıç",
   },
   {
-    title: "Supply and Demand: Market Forces in Action",
-    description: "Run a bakery and experience firsthand how pricing affects your inventory and profits.",
-    category: "Economics",
-    difficulty: "Intermediate",
+    title: "Arz ve Talep: Piyasa Güçleri",
+    description: "Bir fırın işletin ve fiyatlandırmanın envanterinizi ve kârlarınızı nasıl etkilediğini birebir deneyimleyin.",
+    category: "Ekonomi",
+    difficulty: "Orta",
   },
   {
-    title: "The Water Cycle: Earth's Recycling System",
-    description: "Follow a water molecule's journey through evaporation, condensation, precipitation and collection.",
-    category: "Environmental Science",
-    difficulty: "Beginner",
+    title: "Su Döngüsü: Dünyanın Geri Dönüşüm Sistemi",
+    description: "Bir su molekülünün buharlaşma, yoğunlaşma, yağış ve toplanma aşamalarında geçirdiği yolculuğu takip edin.",
+    category: "Çevre Bilimi",
+    difficulty: "Başlangıç",
   },
   {
-    title: "Neural Networks: Building a Simple Classifier",
-    description: "Create a neural network from scratch and see how it learns to recognize patterns.",
-    category: "Computer Science",
-    difficulty: "Advanced",
+    title: "Sinir Ağları: Basit Bir Sınıflandırıcı Oluşturma",
+    description: "Sıfırdan bir sinir ağı oluşturun ve desenleri nasıl tanımayı öğrendiğini görün.",
+    category: "Bilgisayar Bilimleri",
+    difficulty: "İleri",
   },
   {
-    title: "Newton's Laws of Motion in Action",
-    description: "Experiment with forces and see how they affect the motion of objects in various scenarios.",
-    category: "Physics",
-    difficulty: "Intermediate",
+    title: "Newton'un Hareket Kanunları",
+    description: "Kuvvetlerle deney yapın ve çeşitli senaryolarda nesnelerin hareketini nasıl etkilediklerini görün.",
+    category: "Fizik",
+    difficulty: "Orta",
   },
   {
-    title: "DNA Replication: The Copy Machine of Life",
-    description: "Witness how DNA unzips and creates exact copies of itself during cell division.",
-    category: "Molecular Biology",
-    difficulty: "Advanced",
+    title: "DNA Replikasyonu: Hayatın Kopya Makinesi",
+    description: "DNA'nın hücre bölünmesi sırasında nasıl açıldığını ve kendisinin tıpatıp kopyalarını oluşturduğuna tanık olun.",
+    category: "Moleküler Biyoloji",
+    difficulty: "İleri",
   },
 ];
 
@@ -54,10 +54,10 @@ const Examples = () => {
       
       <main className="flex-grow py-12">
         <div className="container mx-auto px-4">
-          <h1 className="text-4xl font-bold text-center mb-6">Example Simulations</h1>
+          <h1 className="text-4xl font-bold text-center mb-6">Örnek Simülasyonlar</h1>
           <p className="text-center text-slate-600 max-w-2xl mx-auto mb-12">
-            Browse our library of pre-built learning simulations across various fields of study. 
-            These examples show the power of experiential learning.
+            Çeşitli çalışma alanlarındaki hazır öğrenme simülasyonlarımıza göz atın.
+            Bu örnekler, deneyimsel öğrenmenin gücünü göstermektedir.
           </p>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -80,7 +80,7 @@ const Examples = () => {
                     variant="outline" 
                     className="w-full"
                   >
-                    View Simulation
+                    Simülasyonu Görüntüle
                   </Button>
                 </CardContent>
               </Card>
@@ -89,10 +89,10 @@ const Examples = () => {
           
           <div className="text-center mt-12">
             <p className="text-slate-600 mb-4">
-              Don't see what you're looking for? Create a custom simulation!
+              Aradığınızı bulamıyor musunuz? Özel bir simülasyon oluşturun!
             </p>
             <Button onClick={() => navigate('/')} className="px-6">
-              Create Your Own
+              Kendi Simülasyonunuzu Oluşturun
             </Button>
           </div>
         </div>

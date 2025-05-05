@@ -17,9 +17,9 @@ const InteractiveElements: React.FC<InteractiveElementsProps> = ({ elements }) =
   
   return (
     <div className="space-y-6">
-      <h3 className="text-lg font-semibold">Interactive Elements</h3>
+      <h3 className="text-lg font-semibold">Etkileşimli Öğeler</h3>
       <p className="text-slate-600 mb-4">
-        Experiment with these controls to see how different variables affect the outcome.
+        Farklı değişkenlerin sonucu nasıl etkilediğini görmek için bu kontrollerle deney yapın.
       </p>
       
       <div className="space-y-4">
@@ -46,7 +46,7 @@ const InteractiveElements: React.FC<InteractiveElementsProps> = ({ elements }) =
                   label={element.label}
                   description={element.description}
                   defaultValue={Boolean(element.defaultValue)}
-                  feedback={element.feedback as { 'true': string, 'false': string } || { 'true': 'On', 'false': 'Off' }}
+                  feedback={element.feedback as { 'true': string, 'false': string } || { 'true': 'Açık', 'false': 'Kapalı' }}
                 />
               );
             case 'button':
