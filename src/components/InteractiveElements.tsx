@@ -34,7 +34,7 @@ const InteractiveElements: React.FC<InteractiveElementsProps> = ({ elements }) =
             key={element.id}
             id={element.id}
             question={element.question || element.label || element.description || ''}
-            answer={element.answer || element.correctAnswer || element.feedback?.['100'] || element.description || ''}
+            answer={element.answer || element.correctAnswer || element.feedback?.['100'] || ''}
             explanation={element.explanation || ''}
           />
         ))}

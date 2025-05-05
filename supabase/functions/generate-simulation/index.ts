@@ -328,6 +328,48 @@ function analyzeTopicKeywords(prompt: string): string[] {
       lowercasePrompt.includes("bilişim")) {
     topics.push("bilgisayar ve yazılım");
   }
+
+  // Dil ve Edebiyat ile ilgili anahtar kelimeler
+  if (lowercasePrompt.includes("dil") || 
+      lowercasePrompt.includes("edebiyat") || 
+      lowercasePrompt.includes("gramer") ||
+      lowercasePrompt.includes("şiir") ||
+      lowercasePrompt.includes("roman") ||
+      lowercasePrompt.includes("yazar") ||
+      lowercasePrompt.includes("kelime") ||
+      lowercasePrompt.includes("cümle") ||
+      lowercasePrompt.includes("metin") ||
+      lowercasePrompt.includes("hikaye")) {
+    topics.push("dil ve edebiyat");
+  }
+
+  // Sanat ve Müzik ile ilgili anahtar kelimeler
+  if (lowercasePrompt.includes("sanat") || 
+      lowercasePrompt.includes("müzik") || 
+      lowercasePrompt.includes("resim") ||
+      lowercasePrompt.includes("heykel") ||
+      lowercasePrompt.includes("tiyatro") ||
+      lowercasePrompt.includes("sinema") ||
+      lowercasePrompt.includes("dans") ||
+      lowercasePrompt.includes("nota") ||
+      lowercasePrompt.includes("enstrüman") ||
+      lowercasePrompt.includes("beste")) {
+    topics.push("sanat ve müzik");
+  }
+
+  // Sağlık ve Tıp ile ilgili anahtar kelimeler
+  if (lowercasePrompt.includes("sağlık") || 
+      lowercasePrompt.includes("tıp") || 
+      lowercasePrompt.includes("hastalık") ||
+      lowercasePrompt.includes("tedavi") ||
+      lowercasePrompt.includes("ilaç") ||
+      lowercasePrompt.includes("doktor") ||
+      lowercasePrompt.includes("hastane") ||
+      lowercasePrompt.includes("organ") ||
+      lowercasePrompt.includes("ameliyat") ||
+      lowercasePrompt.includes("sağlıklı")) {
+    topics.push("sağlık ve tıp");
+  }
   
   // Eğer hiçbir konu belirlenemezse genel olarak işaretleyelim
   if (topics.length === 0) {
@@ -515,6 +557,81 @@ function generateDefaultQuestions(prompt: string, topicKeywords: string[]): Arra
           question: `${prompt} konusunun yazılım endüstrisindeki uygulamaları nelerdir?`,
           answer: "Endüstri standardı çözümler, yazılım projeleri ve teknolojik trendler",
           explanation: `${prompt} konusunun gerçek dünya yazılım uygulamalarını incelemek, teorik bilgilerin pratikte nasıl kullanıldığını anlamak için önemlidir.`
+        }
+      ];
+
+    case "dil ve edebiyat":
+      return [
+        {
+          id: "lang-lit-question-1",
+          type: "question",
+          question: `${prompt} konusunun dil bilimindeki yeri nedir?`,
+          answer: "Dilbilimsel yapılar, etimolojik kökler ve dil özellikleri",
+          explanation: `${prompt} konusunun dil bilimine katkılarını ve dilbilimsel özelliklerini anlamak, dil ile ilgili daha derin bir kavrayış sağlar.`
+        },
+        {
+          id: "lang-lit-question-2",
+          type: "question",
+          question: `${prompt} konusu edebi eserlerde nasıl ele alınmıştır?`,
+          answer: "Edebi akımlar, yazarlar ve temsil biçimleri",
+          explanation: `${prompt} konusunun edebi eserlerdeki temsilini incelemek, toplumsal ve kültürel bağlamı anlamak açısından önemlidir.`
+        },
+        {
+          id: "lang-lit-question-3",
+          type: "question",
+          question: `${prompt} konusunun güncel dil kullanımına etkileri nelerdir?`,
+          answer: "Dil değişimleri, yeni terimler ve iletişim biçimleri",
+          explanation: `${prompt} konusunun güncel dil kullanımına etkilerini anlamak, dildeki değişim ve gelişim süreçlerini kavramak için önemlidir.`
+        }
+      ];
+
+    case "sanat ve müzik":
+      return [
+        {
+          id: "art-music-question-1",
+          type: "question",
+          question: `${prompt} konusunun sanat tarihindeki gelişimi nasıl olmuştur?`,
+          answer: "Sanat akımları, önemli sanatçılar ve tarihsel dönüm noktaları",
+          explanation: `${prompt} konusunun sanat tarihindeki yerini anlamak, sanatsal ifade biçimlerinin tarihsel gelişimini kavramak için önemlidir.`
+        },
+        {
+          id: "art-music-question-2",
+          type: "question",
+          question: `${prompt} konusu müzikte nasıl ifade edilmiştir?`,
+          answer: "Müzik türleri, kompozisyon teknikleri ve besteciler",
+          explanation: `${prompt} konusunun müzikal ifadesini incelemek, müziğin farklı kültürlerde ve dönemlerde nasıl kullanıldığını anlamak için önemlidir.`
+        },
+        {
+          id: "art-music-question-3",
+          type: "question",
+          question: `${prompt} konusunun çağdaş sanattaki yorumları nelerdir?`,
+          answer: "Modern sanat akımları, teknikler ve sanatçılar",
+          explanation: `${prompt} konusunun çağdaş sanattaki yorumlarını incelemek, günümüz sanat anlayışı ve ifade biçimlerini anlamak için önemlidir.`
+        }
+      ];
+
+    case "sağlık ve tıp":
+      return [
+        {
+          id: "health-med-question-1",
+          type: "question",
+          question: `${prompt} konusunun tıbbi önemi nedir?`,
+          answer: "Hastalıklar, tedavi yöntemleri ve sağlık uygulamaları",
+          explanation: `${prompt} konusunun tıbbi önemini anlamak, insan sağlığına etkilerini ve tıbbi uygulamalardaki yerini kavramak için gereklidir.`
+        },
+        {
+          id: "health-med-question-2",
+          type: "question",
+          question: `${prompt} konusunda güncel araştırmalar nelerdir?`,
+          answer: "Bilimsel çalışmalar, klinik araştırmalar ve yeni tedavi yaklaşımları",
+          explanation: `${prompt} konusundaki güncel araştırmaları takip etmek, tıp alanındaki gelişmeleri ve yenilikleri anlamak için önemlidir.`
+        },
+        {
+          id: "health-med-question-3",
+          type: "question",
+          question: `${prompt} konusu halk sağlığını nasıl etkilemektedir?`,
+          answer: "Toplum sağlığı etkileri, koruyucu sağlık hizmetleri ve sağlık politikaları",
+          explanation: `${prompt} konusunun halk sağlığına etkilerini anlamak, toplumsal sağlık sorunlarını ve çözüm yaklaşımlarını değerlendirmek için önemlidir.`
         }
       ];
       
