@@ -8,16 +8,24 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import InteractiveElements from '@/components/InteractiveElements';
 import InteractiveInput from '@/components/interactive/InteractiveInput';
+import InteractiveQuestion from '@/components/interactive/InteractiveQuestion';
 import { SimulationData } from '@/services/geminiService';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 interface Question {
+  id: string;
   question: string;
   options?: string[];
   correctAnswer: string;
   explanation: string;
+}
+
+interface UserResponse {
+  questionIndex: number;
+  answer: string;
+  feedback: string;
 }
 
 const SimulationDetail = () => {
@@ -28,8 +36,10 @@ const SimulationDetail = () => {
   const [simulation, setSimulation] = useState<SimulationData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [practiceQuestions, setPracticeQuestions] = useState<Question[]>([]);
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0);
   const [userAnswers, setUserAnswers] = useState<{[key: string]: string}>({});
+  const [userResponses, setUserResponses] = useState<UserResponse[]>([]);
 
   useEffect(() => {
     const fetchSimulation = async () => {
@@ -50,21 +60,22 @@ const SimulationDetail = () => {
         setSimulation(simulationData);
         
         // Soruları oluştur
-        if (simulationData.questions && simulationData.questions.length > 0) {
-          // Matematiksel türev soruları için özel sorular oluşturalım
-          if (simulationData.title.toLowerCase().includes("türev") || 
-              simulationData.explanation.toLowerCase().includes("türev")) {
-            const derivativeQuestions = generateDerivativeQuestions();
-            setQuestions(derivativeQuestions);
-          } else {
-            // Diğer konular için normal soru üretimi
-            const generatedQuestions = simulationData.questions.map(q => ({
-              question: q,
-              correctAnswer: generateAnswer(q),
-              explanation: generateExplanation(q, simulationData.explanation)
-            }));
-            setQuestions(generatedQuestions);
-          }
+        if (simulationData.title.toLowerCase().includes("türev") || 
+            simulationData.explanation.toLowerCase().includes("türev")) {
+          const derivativeQuestions = generateDerivativeQuestions();
+          setQuestions(derivativeQuestions);
+          
+          const practiceDQuestions = generatePracticeQuestions();
+          setPracticeQuestions(practiceDQuestions);
+        } else if (simulationData.questions && simulationData.questions.length > 0) {
+          // Diğer konular için normal soru üretimi
+          const generatedQuestions = simulationData.questions.map((q, index) => ({
+            id: `q-${index}`,
+            question: q,
+            correctAnswer: generateAnswer(q),
+            explanation: generateExplanation(q, simulationData.explanation)
+          }));
+          setQuestions(generatedQuestions);
         }
       } catch (error: any) {
         toast({
@@ -85,24 +96,46 @@ const SimulationDetail = () => {
   const generateDerivativeQuestions = (): Question[] => {
     return [
       {
+        id: "derivative-1",
         question: "x^2+5 fonksiyonunun türevi nedir?",
         correctAnswer: "2x",
         explanation: "f(x) = x^2+5 fonksiyonunun türevi, x^n türevi için kural olan n.x^(n-1) formülünü kullanarak hesaplanır. Burada n=2 olduğu için, 2.x^(2-1) = 2x olur. Sabit terim olan 5'in türevi 0 olduğu için sonuç 2x'tir."
       },
       {
+        id: "derivative-2",
         question: "3x^3-2x+7 fonksiyonunun türevi nedir?",
         correctAnswer: "9x^2-2",
         explanation: "f(x) = 3x^3-2x+7 fonksiyonunun türevi için terim terim türev alırız. 3x^3'ün türevi 3.3x^2 = 9x^2, -2x'in türevi -2, ve sabit terim olan 7'nin türevi 0'dır. Sonuç: 9x^2-2"
       },
       {
+        id: "derivative-3",
         question: "sin(x) fonksiyonunun türevi nedir?",
         correctAnswer: "cos(x)",
         explanation: "sin(x) fonksiyonunun türevi cos(x)'tir. Bu, trigonometrik fonksiyonların türev kurallarından gelir."
       },
       {
+        id: "derivative-4",
         question: "x.e^x fonksiyonunun türevi nedir?",
         correctAnswer: "e^x+x.e^x",
         explanation: "Bu türevi çarpım kuralı kullanarak hesaplamamız gerekir. f(x)=x ve g(x)=e^x için, (f.g)' = f'.g + f.g' formülünü kullanırız. Burada f'=1 ve g'=e^x olduğundan, sonuç 1.e^x + x.e^x = e^x(1+x) = e^x+x.e^x olur."
+      }
+    ];
+  };
+  
+  // Uygulama soruları oluşturma
+  const generatePracticeQuestions = (): Question[] => {
+    return [
+      {
+        id: "practice-1",
+        question: "Sabit bir sayının türevi nedir?",
+        correctAnswer: "0",
+        explanation: "Herhangi bir sabit sayının türevi her zaman 0'dır. Örneğin, f(x) = 5 fonksiyonunun türevi 0'dır."
+      },
+      {
+        id: "practice-2",
+        question: "Türev alma işleminde zincir kuralı ne için kullanılır?",
+        correctAnswer: "Bileşik fonksiyonların türevini almak için",
+        explanation: "Zincir kuralı, iç içe fonksiyonlardan oluşan bileşik fonksiyonların türevini almayı sağlayan temel bir kuraldır. f(g(x)) şeklindeki bir fonksiyonun türevi, f'(g(x)) × g'(x) olarak hesaplanır."
       }
     ];
   };
@@ -148,11 +181,48 @@ const SimulationDetail = () => {
     }
   };
 
-  const handleUserAnswer = (questionIndex: number, answer: string) => {
+  const handleUserAnswer = async (questionIndex: number, answer: string) => {
+    // Kullanıcının cevabını kaydet
     setUserAnswers({
       ...userAnswers,
       [questionIndex]: answer
     });
+    
+    // Cevap için Gemini çağrısı yapılabilir
+    // Not: Bu kısım gerçek bir uygulamada Supabase Edge Function üzerinden yapılmalı
+    try {
+      // Burada gerçekten Gemini'yi çağırmak yerine basit bir değerlendirme yapıyoruz
+      const activeQuestion = questions[questionIndex];
+      let feedback;
+      
+      // Cevabı değerlendir
+      const isCorrect = answer.toLowerCase().trim() === activeQuestion.correctAnswer.toLowerCase().trim() ||
+                        answer.toLowerCase().trim().replace(/\s+/g, '') === activeQuestion.correctAnswer.toLowerCase().trim().replace(/\s+/g, '');
+      
+      if (isCorrect) {
+        feedback = `Tebrikler! Bu yanıt doğru. ${activeQuestion.explanation}`;
+      } else {
+        feedback = `Bu yanıtınız üzerinde biraz daha düşünmek gerekiyor. Yanıtınızda "${answer}" ifadesini kullandınız, ancak türev işleminde dikkat etmeniz gereken başka noktalar da var. Türev alırken fonksiyonun her terimini ayrı ayrı değerlendirmeli ve kuralları doğru uygulamalısınız.`;
+      }
+      
+      // Kullanıcının cevabını ve değerlendirmeyi kaydet
+      setUserResponses(prev => [
+        ...prev,
+        {
+          questionIndex,
+          answer,
+          feedback
+        }
+      ]);
+      
+    } catch (error) {
+      console.error("Yanıt değerlendirme hatası:", error);
+      toast({
+        title: "Hata",
+        description: "Yanıtınız değerlendirilirken bir hata oluştu",
+        variant: "destructive",
+      });
+    }
   };
 
   if (isLoading) {
@@ -185,6 +255,7 @@ const SimulationDetail = () => {
   }
 
   const activeQuestion = questions[activeQuestionIndex];
+  const activeResponse = userResponses.find(r => r.questionIndex === activeQuestionIndex);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -238,6 +309,29 @@ const SimulationDetail = () => {
                 </>
               )}
               
+              {practiceQuestions && practiceQuestions.length > 0 && (
+                <>
+                  <div className="mb-6">
+                    <h4 className="text-lg font-semibold mb-3">Hızlı Soru-Cevap</h4>
+                    <p className="text-slate-600 mb-4">
+                      Aşağıdaki sorulara yanıt bulmak için düşünün ve cevabı görmek için butona tıklayın.
+                    </p>
+                    <div className="space-y-4">
+                      {practiceQuestions.map((pq) => (
+                        <InteractiveQuestion 
+                          key={pq.id}
+                          id={pq.id}
+                          question={pq.question}
+                          answer={pq.correctAnswer}
+                          explanation={pq.explanation}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  <Separator className="my-6" />
+                </>
+              )}
+              
               <div className="mb-6">
                 <h4 className="text-lg font-semibold mb-2">Açıklama</h4>
                 <p className="text-slate-600">{simulation.explanation}</p>
@@ -257,10 +351,10 @@ const SimulationDetail = () => {
                 <div className="space-y-4 p-4 bg-slate-50 rounded-lg">
                   <div className="space-y-1">
                     <label className="text-base font-medium text-slate-900">
-                      Cevabınız
+                      Anlayışınızı Gösterin
                     </label>
                     <p className="text-sm text-slate-500">
-                      Yukarıdaki soruya cevabınızı yazın ve gönderin
+                      Bu konudaki anlayışınızı göstermek için cevabınızı yazın. Size detaylı geri bildirim sağlayacağız.
                     </p>
                   </div>
                   
@@ -270,10 +364,17 @@ const SimulationDetail = () => {
                     description=""
                     feedback={{
                       [activeQuestion.correctAnswer.toLowerCase()]: "Doğru! " + activeQuestion.explanation,
-                      'default': "Yanlış cevap. Tekrar deneyin veya cevabı görüntülemek için aşağıdaki düğmeye tıklayın."
+                      'default': "Yanıtınız değerlendiriliyor..."
                     }}
                     onSubmit={(value) => handleUserAnswer(activeQuestionIndex, value)}
                   />
+                  
+                  {activeResponse && (
+                    <div className="mt-3 p-3 border rounded-md border-blue-200 bg-blue-50">
+                      <p className="text-sm text-blue-800 font-medium">Yanıtınızın Değerlendirmesi:</p>
+                      <p className="text-sm text-blue-700 mt-1">{activeResponse.feedback}</p>
+                    </div>
+                  )}
                   
                   <div className="flex justify-between mt-4">
                     <Button 
