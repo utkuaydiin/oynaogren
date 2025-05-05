@@ -2,30 +2,63 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/contexts/AuthContext';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { User, LogOut } from 'lucide-react';
 
 const Navbar = () => {
+  const { user, signOut } = useAuth();
+
   return (
     <nav className="bg-white shadow-sm py-4">
       <div className="container mx-auto px-4 flex justify-between items-center">
         <Link to="/" className="text-2xl font-bold text-primary-600">
-          LifeSim
+          OynaÖğren
         </Link>
         
         <div className="hidden md:flex space-x-6 items-center">
           <Link to="/" className="text-slate-600 hover:text-primary-600 font-medium">
-            Home
+            Ana Sayfa
           </Link>
           <Link to="/how-it-works" className="text-slate-600 hover:text-primary-600 font-medium">
-            How It Works
+            Nasıl Çalışır
           </Link>
           <Link to="/examples" className="text-slate-600 hover:text-primary-600 font-medium">
-            Examples
+            Örnekler
           </Link>
-          <Link to="/saved-simulations" className="text-slate-600 hover:text-primary-600 font-medium">
-            My Simulations
-          </Link>
-          <Button variant="outline">Sign In</Button>
-          <Button>Sign Up</Button>
+          {user ? (
+            <>
+              <Link to="/saved-simulations" className="text-slate-600 hover:text-primary-600 font-medium">
+                Simülasyonlarım
+              </Link>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <User className="h-4 w-4 mr-2" /> Hesabım
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem onClick={() => signOut()}>
+                    <LogOut className="h-4 w-4 mr-2" /> Çıkış Yap
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
+          ) : (
+            <>
+              <Link to="/auth">
+                <Button variant="outline">Giriş Yap</Button>
+              </Link>
+              <Link to="/auth">
+                <Button>Kayıt Ol</Button>
+              </Link>
+            </>
+          )}
         </div>
         
         <div className="md:hidden">

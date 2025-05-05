@@ -27,14 +27,14 @@ const Index = () => {
       setSimulation(result);
       
       toast({
-        title: "Simulation Created",
-        description: "Your learning simulation is ready!",
+        title: "Simülasyon Oluşturuldu",
+        description: "Öğrenme simülasyonunuz hazır!",
       });
     } catch (error) {
-      console.error("Error generating simulation:", error);
+      console.error("Simülasyon oluşturulurken hata:", error);
       toast({
-        title: "Generation Failed",
-        description: "Something went wrong while creating your simulation.",
+        title: "Oluşturma Başarısız",
+        description: "Simülasyon oluşturulurken bir hata oluştu.",
         variant: "destructive",
       });
     } finally {
@@ -52,10 +52,10 @@ const Index = () => {
         <section className="py-12 md:py-16 px-4" id="simulation-section">
           <div className="container mx-auto">
             <div className="text-center mb-10">
-              <h2 className="text-3xl font-bold mb-4">Create Your Learning Simulation</h2>
+              <h2 className="text-3xl font-bold mb-4">Öğrenme Simülasyonunuzu Oluşturun</h2>
               <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-                Enter a topic you want to learn, and we'll generate an interactive 
-                simulation to help you understand it better.
+                Öğrenmek istediğiniz bir konuyu girin ve daha iyi anlamanıza yardımcı olacak 
+                etkileşimli bir simülasyon oluşturalım.
               </p>
             </div>
             
@@ -75,13 +75,12 @@ const Index = () => {
         
         <section className="py-16 bg-primary-50">
           <div className="container mx-auto px-4 text-center">
-            <h2 className="text-3xl font-bold mb-4">Ready to Transform How You Learn?</h2>
+            <h2 className="text-3xl font-bold mb-4">Öğrenme Şeklinizi Dönüştürmeye Hazır mısınız?</h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto mb-8">
-              Join thousands of learners who are experiencing concepts through simulation 
-              instead of just reading about them.
+              Konuları sadece okumak yerine simülasyonlar aracılığıyla deneyimleyen binlerce öğrenciye katılın.
             </p>
             <button className="bg-primary-600 hover:bg-primary-700 text-white font-medium py-3 px-8 rounded-md">
-              Get Started
+              Hemen Başla
             </button>
           </div>
         </section>
