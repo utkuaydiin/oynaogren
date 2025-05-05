@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import InteractiveElements from '@/components/InteractiveElements';
+import InteractiveInput from '@/components/interactive/InteractiveInput';
 import { SimulationData } from '@/services/geminiService';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
