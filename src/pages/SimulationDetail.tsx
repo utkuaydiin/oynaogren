@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -5,8 +6,6 @@ import Footer from '@/components/Footer';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import InteractiveElements from '@/components/InteractiveElements';
-import InteractiveInput from '@/components/interactive/InteractiveInput';
 import InteractiveQuestion from '@/components/interactive/InteractiveQuestion';
 import { SimulationData } from '@/services/geminiService';
 import { useAuth } from '@/contexts/AuthContext';
@@ -21,12 +20,6 @@ interface Question {
   explanation: string;
 }
 
-interface UserResponse {
-  questionIndex: number;
-  answer: string;
-  feedback: string;
-}
-
 const SimulationDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -36,9 +29,6 @@ const SimulationDetail = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [practiceQuestions, setPracticeQuestions] = useState<Question[]>([]);
-  const [activeQuestionIndex, setActiveQuestionIndex] = useState(0);
-  const [userAnswers, setUserAnswers] = useState<{[key: string]: string}>({});
-  const [userResponses, setUserResponses] = useState<UserResponse[]>([]);
 
   useEffect(() => {
     const fetchSimulation = async () => {
@@ -66,6 +56,9 @@ const SimulationDetail = () => {
           
           const practiceDQuestions = generatePracticeQuestions();
           setPracticeQuestions(practiceDQuestions);
+        } else if (simulationData.title.toLowerCase().includes("fizik")) {
+          const physicsQuests = generatePhysicsQuestions();
+          setQuestions(physicsQuests);
         } else if (simulationData.questions && simulationData.questions.length > 0) {
           // Diğer konular için normal soru üretimi
           const generatedQuestions = simulationData.questions.map((q, index) => ({
@@ -129,6 +122,54 @@ const SimulationDetail = () => {
         question: "tan(x) fonksiyonunun türevi nedir?",
         correctAnswer: "sec^2(x)",
         explanation: "Tanjant fonksiyonunun türevi, sekant fonksiyonunun karesidir: d/dx(tan(x)) = sec^2(x)"
+      },
+      {
+        id: "derivative-7",
+        question: "e^(2x) fonksiyonunun türevi nedir?",
+        correctAnswer: "2e^(2x)",
+        explanation: "Zincir kuralı kullanarak, içteki fonksiyonun türevini dıştaki fonksiyonun türevi ile çarparız. e^u için türev e^u × u' formülündedir. Burada u = 2x ve u' = 2 olduğundan, sonuç 2e^(2x) olur."
+      },
+      {
+        id: "derivative-8",
+        question: "4x^5 fonksiyonunun türevi nedir?",
+        correctAnswer: "20x^4",
+        explanation: "Kuvvet kuralı kullanarak, x^n'in türevi n.x^(n-1)'dir. Bu durumda 4x^5'in türevi 4 × 5 × x^4 = 20x^4 olur."
+      }
+    ];
+  };
+
+  // Fizik soruları oluşturan fonksiyon
+  const generatePhysicsQuestions = (): Question[] => {
+    return [
+      {
+        id: "physics-1",
+        question: "Bir cismin ivmesi neye bağlıdır?",
+        correctAnswer: "Cisme etki eden net kuvvet ve cismin kütlesine",
+        explanation: "Newton'un ikinci yasasına göre, bir cismin ivmesi (a), cisme etki eden net kuvvetin (F), cismin kütlesine (m) bölümüne eşittir: a = F/m"
+      },
+      {
+        id: "physics-2",
+        question: "Kinetik enerji formülü nedir?",
+        correctAnswer: "KE = (1/2)mv²",
+        explanation: "Kinetik enerji, hareket halindeki bir cismin sahip olduğu enerjidir ve kütle (m) ile hızın karesinin (v²) çarpımının yarısına eşittir."
+      },
+      {
+        id: "physics-3",
+        question: "Ohm kanunu nedir?",
+        correctAnswer: "V = I × R",
+        explanation: "Ohm kanunu, bir elektrik devresinde gerilim (V), akım (I) ve direnç (R) arasındaki ilişkiyi tanımlar. Gerilim, akım ile direncin çarpımına eşittir."
+      },
+      {
+        id: "physics-4",
+        question: "Bir cismin düşme hızı düşme yüksekliğiyle nasıl ilişkilidir?",
+        correctAnswer: "v = √(2gh)",
+        explanation: "Potansiyel enerjinin kinetik enerjiye dönüşümü prensibinden, bir cismin h yüksekliğinden düşerken elde ettiği hız v = √(2gh) formülüyle hesaplanır, burada g yerçekimi ivmesidir."
+      },
+      {
+        id: "physics-5",
+        question: "Işık hızı yaklaşık olarak kaç m/s'dir?",
+        correctAnswer: "3 × 10⁸ m/s",
+        explanation: "Işığın boşluktaki hızı yaklaşık olarak 299,792,458 m/s'dir, genellikle 3 × 10⁸ m/s olarak yuvarlanır ve fizikteki en temel sabitlerden biridir."
       }
     ];
   };
@@ -192,62 +233,6 @@ const SimulationDetail = () => {
     return `${relevantSentence}. Bu sorunun cevabı simülasyondaki temel kavramları anlamakla ilgilidir.`;
   };
 
-  const nextQuestion = () => {
-    if (activeQuestionIndex < questions.length - 1) {
-      setActiveQuestionIndex(activeQuestionIndex + 1);
-    }
-  };
-
-  const previousQuestion = () => {
-    if (activeQuestionIndex > 0) {
-      setActiveQuestionIndex(activeQuestionIndex - 1);
-    }
-  };
-
-  const handleUserAnswer = async (questionIndex: number, answer: string) => {
-    // Kullanıcının cevabını kaydet
-    setUserAnswers({
-      ...userAnswers,
-      [questionIndex]: answer
-    });
-    
-    // Cevap için Gemini çağrısı yapılabilir
-    // Not: Bu kısım gerçek bir uygulamada Supabase Edge Function üzerinden yapılmalı
-    try {
-      // Burada gerçekten Gemini'yi çağırmak yerine basit bir değerlendirme yapıyoruz
-      const activeQuestion = questions[questionIndex];
-      let feedback;
-      
-      // Cevabı değerlendir
-      const isCorrect = answer.toLowerCase().trim() === activeQuestion.correctAnswer.toLowerCase().trim() ||
-                        answer.toLowerCase().trim().replace(/\s+/g, '') === activeQuestion.correctAnswer.toLowerCase().trim().replace(/\s+/g, '');
-      
-      if (isCorrect) {
-        feedback = `Tebrikler! Bu yanıt doğru. ${activeQuestion.explanation}`;
-      } else {
-        feedback = `Bu yanıtınız üzerinde biraz daha düşünmek gerekiyor. Yanıtınızda "${answer}" ifadesini kullandınız, ancak türev işleminde dikkat etmeniz gereken başka noktalar da var. Türev alırken fonksiyonun her terimini ayrı ayrı değerlendirmeli ve kuralları doğru uygulamalısınız.`;
-      }
-      
-      // Kullanıcının cevabını ve değerlendirmeyi kaydet
-      setUserResponses(prev => [
-        ...prev,
-        {
-          questionIndex,
-          answer,
-          feedback
-        }
-      ]);
-      
-    } catch (error) {
-      console.error("Yanıt değerlendirme hatası:", error);
-      toast({
-        title: "Hata",
-        description: "Yanıtınız değerlendirilirken bir hata oluştu",
-        variant: "destructive",
-      });
-    }
-  };
-
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col">
@@ -276,9 +261,6 @@ const SimulationDetail = () => {
       </div>
     );
   }
-
-  const activeQuestion = questions[activeQuestionIndex];
-  const activeResponse = userResponses.find(r => r.questionIndex === activeQuestionIndex);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -319,19 +301,6 @@ const SimulationDetail = () => {
               
               <Separator className="my-6" />
               
-              {simulation.interactiveElements && simulation.interactiveElements.length > 0 && (
-                <>
-                  <div className="mb-6">
-                    <h4 className="text-lg font-semibold mb-3">Etkileşimli Öğeler</h4>
-                    <p className="text-slate-600 mb-4">
-                      Farklı değişkenlerin sonucu nasıl etkilediğini görmek için bu kontrollerle deney yapın.
-                    </p>
-                    <InteractiveElements elements={simulation.interactiveElements} />
-                  </div>
-                  <Separator className="my-6" />
-                </>
-              )}
-              
               {practiceQuestions && practiceQuestions.length > 0 && (
                 <>
                   <div className="mb-6">
@@ -366,7 +335,7 @@ const SimulationDetail = () => {
         {questions.length > 0 && (
           <Card className="w-full max-w-3xl mx-auto overflow-hidden">
             <CardContent className="p-6">
-              <h4 className="text-lg font-semibold mb-4">Türev Alıştırmaları</h4>
+              <h4 className="text-lg font-semibold mb-4">Konuyla İlgili Alıştırmalar</h4>
               
               <div className="mb-6">
                 <div className="space-y-4">

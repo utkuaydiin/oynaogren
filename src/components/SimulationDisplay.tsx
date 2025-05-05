@@ -1,8 +1,8 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import InteractiveElements from './InteractiveElements';
 import InteractiveQuestion from './interactive/InteractiveQuestion';
 import { SimulationData } from '@/services/geminiService';
 import { useAuth } from '@/contexts/AuthContext';
@@ -33,7 +33,7 @@ const LoadingSimulation = () => (
   </div>
 );
 
-// Türev soruları ekleme - bunlar her zaman hazır olacak
+// Türev soruları - her türev simülasyonunda gösterilecek
 const derivativeQuestions = [
   {
     id: "derivative-1",
@@ -76,14 +76,132 @@ const derivativeQuestions = [
     question: "2x^3 - 5x^2 + 4x - 7 fonksiyonunun türevi nedir?",
     answer: "6x^2 - 10x + 4",
     explanation: "Polinom fonksiyonlarının türevini almak için her terimin türevini ayrı ayrı hesaplarız. 2x^3'ün türevi 6x^2, -5x^2'nin türevi -10x, 4x'in türevi 4 ve sabit terim -7'nin türevi 0'dır. Sonuç: 6x^2 - 10x + 4"
+  },
+  {
+    id: "derivative-8",
+    question: "tan(x) fonksiyonunun türevi nedir?",
+    answer: "sec^2(x)",
+    explanation: "Tanjant fonksiyonunun türevi, sekant fonksiyonunun karesidir: d/dx(tan(x)) = sec^2(x)"
+  },
+  {
+    id: "derivative-9",
+    question: "x * ln(x) fonksiyonunun türevi nedir?",
+    answer: "ln(x) + 1",
+    explanation: "Bu türevi çarpım kuralı kullanarak hesaplıyoruz. f(x) = x ve g(x) = ln(x) için, (f.g)' = f'.g + f.g' formülünü kullanırız. Burada f' = 1 ve g' = 1/x olduğundan, sonuç 1.ln(x) + x.(1/x) = ln(x) + 1 olur."
+  },
+  {
+    id: "derivative-10",
+    question: "e^(3x) fonksiyonunun türevi nedir?",
+    answer: "3e^(3x)",
+    explanation: "Zincir kuralı kullanarak, içteki fonksiyonun türevini dıştaki fonksiyonun türevi ile çarparız. e^u için türev e^u × u' formülündedir. Burada u = 3x ve u' = 3 olduğundan, sonuç 3e^(3x) olur."
+  }
+];
+
+// Fizik soruları - fizik ile ilgili simülasyonlarda gösterilecek
+const physicsQuestions = [
+  {
+    id: "physics-1",
+    question: "Bir cismin düşme hızı, düşme yüksekliğine nasıl bağlıdır?",
+    answer: "v = √(2gh)",
+    explanation: "Bir cismin h yüksekliğinden serbest düşmesi durumunda, yerçekimi ivmesi g ile, hızı v = √(2gh) formülü ile hesaplanır. Bu formül, potansiyel enerjinin kinetik enerjiye dönüşümünden elde edilir."
+  },
+  {
+    id: "physics-2",
+    question: "Newton'un ikinci hareket yasası nedir?",
+    answer: "F = m × a",
+    explanation: "Newton'un ikinci yasası, bir cisme uygulanan net kuvvetin (F), cismin kütlesi (m) ile ivmesinin (a) çarpımına eşit olduğunu belirtir. Bu yasa, kuvvet, kütle ve ivme arasındaki temel ilişkiyi tanımlar."
+  },
+  {
+    id: "physics-3",
+    question: "Bir elektrik devresinde dirençler seri bağlandığında toplam direnç nasıl hesaplanır?",
+    answer: "Rtoplam = R1 + R2 + R3 + ...",
+    explanation: "Seri bağlı dirençlerde, toplam direnç tüm dirençlerin toplamına eşittir. Aynı akım tüm dirençlerden geçer ve toplam gerilim her bir direnç üzerindeki gerilimlerin toplamıdır."
+  },
+  {
+    id: "physics-4",
+    question: "Işık hızı yaklaşık olarak kaçtır?",
+    answer: "3 × 10^8 m/s",
+    explanation: "Işık boşlukta saniyede yaklaşık 300.000 km veya 3 × 10^8 metre hızla yayılır. Bu sabit, Albert Einstein'ın görelilik teorisinde çok önemli bir rol oynar ve evrendeki en büyük hız limiti olarak kabul edilir."
+  },
+  {
+    id: "physics-5",
+    question: "Kinetik enerji formülü nedir?",
+    answer: "Ek = (1/2) × m × v^2",
+    explanation: "Kinetik enerji, hareket halindeki bir cismin sahip olduğu enerjidir ve cismin kütlesinin (m) ve hızının karesinin (v²) yarısı olarak hesaplanır. Birim olarak Joule (J) kullanılır."
+  }
+];
+
+// Kimya soruları - kimya ile ilgili simülasyonlarda gösterilecek
+const chemistryQuestions = [
+  {
+    id: "chemistry-1",
+    question: "pH değeri neyi ifade eder?",
+    answer: "Bir çözeltideki hidrojen iyonu konsantrasyonunun eksi logaritmasını",
+    explanation: "pH = -log[H+] formülü ile hesaplanır. pH değeri 7'den küçük olan çözeltiler asidik, 7'den büyük olanlar bazik, 7 olanlar ise nötrdür."
+  },
+  {
+    id: "chemistry-2",
+    question: "Avogadro sayısı nedir?",
+    answer: "6.022 × 10^23",
+    explanation: "Avogadro sayısı, bir molde bulunan atom veya molekül sayısıdır. Bu sayı, kimyasal hesaplamalarda atom veya molekül sayısını mol cinsinden ifade etmek için kullanılır."
+  },
+  {
+    id: "chemistry-3",
+    question: "Suyun kimyasal formülü nedir?",
+    answer: "H2O",
+    explanation: "Su molekülü, iki hidrojen atomu ve bir oksijen atomundan oluşur. Hidrojen atomları, oksijen atomuna kovalent bağlarla bağlanır ve molekül yaklaşık 104.5 derecelik bir açı yapar."
+  },
+  {
+    id: "chemistry-4",
+    question: "Periyodik tabloda en sağda yer alan element grubu hangisidir?",
+    answer: "Soy Gazlar",
+    explanation: "Soy gazlar (He, Ne, Ar, Kr, Xe, Rn), periyodik tablonun en sağındaki 18. grubu oluşturur. Bu elementler kararlı elektronik yapıya sahiptir ve kimyasal tepkimelere girme eğilimleri çok düşüktür."
+  },
+  {
+    id: "chemistry-5",
+    question: "Bir maddenin fiziksel hali (katı, sıvı, gaz) neye bağlıdır?",
+    answer: "Sıcaklık ve basınca",
+    explanation: "Bir maddenin fiziksel hali, sıcaklık ve basınç koşullarına bağlıdır. Faz diyagramları, belirli sıcaklık ve basınç değerlerinde maddenin hangi fiziksel halde bulunduğunu gösterir."
+  }
+];
+
+// Biyoloji soruları - biyoloji ile ilgili simülasyonlarda gösterilecek
+const biologyQuestions = [
+  {
+    id: "biology-1",
+    question: "DNA'nın açılımı nedir?",
+    answer: "Deoksiribo Nükleik Asit",
+    explanation: "DNA, canlıların genetik bilgisini taşıyan bir nükleik asit türüdür. İkili sarmal yapıda olan DNA, adenin, guanin, sitozin ve timin bazlarını içerir."
+  },
+  {
+    id: "biology-2",
+    question: "Fotosentez denklemi nedir?",
+    answer: "6CO2 + 6H2O + ışık enerjisi → C6H12O6 + 6O2",
+    explanation: "Fotosentez, bitkilerin güneş ışığını kullanarak karbondioksit ve sudan glikoz ürettiği süreçtir. Bu süreçte oksijen açığa çıkar ve dünya üzerindeki yaşam için hayati öneme sahiptir."
+  },
+  {
+    id: "biology-3",
+    question: "İnsan vücudunda kaç kromozom bulunur?",
+    answer: "46 (23 çift)",
+    explanation: "İnsan hücreleri normalde 46 kromozom içerir, bunlar 23 çift halinde düzenlenmiştir. 23. çift cinsiyet kromozomlarıdır (XX: kadın, XY: erkek)."
+  },
+  {
+    id: "biology-4",
+    question: "Hücre zarının temel yapısı nedir?",
+    answer: "Fosfolipid çift tabaka",
+    explanation: "Hücre zarı, fosfolipid çift tabakadan oluşur ve içine çeşitli proteinler, glikoproteinler ve kolesterol molekülleri gömülüdür. Bu yapı, yarı geçirgen özellikte olup hücre içi ve dışı arasındaki madde alışverişini kontrol eder."
+  },
+  {
+    id: "biology-5",
+    question: "Mitokondrinin temel görevi nedir?",
+    answer: "Hücresel solunum ve ATP üretimi",
+    explanation: "Mitokondri, 'hücrenin enerji santrali' olarak adlandırılır. Oksijenli solunum yoluyla glikoz gibi besin maddelerinden ATP (adenozin trifosfat) üretir, bu da hücrelerin kullandığı temel enerji molekülüdür."
   }
 ];
 
 const SimulationDisplay: React.FC<SimulationDisplayProps> = ({ simulation, isLoading }) => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [userFeedback, setUserFeedback] = useState<{[key: string]: string}>({});
-  const [isEvaluating, setIsEvaluating] = useState<{[key: string]: boolean}>({});
 
   const saveSimulation = async () => {
     if (!user) {
@@ -123,34 +241,22 @@ const SimulationDisplay: React.FC<SimulationDisplayProps> = ({ simulation, isLoa
     }
   };
 
-  const handleUserAnswer = async (id: string, question: string, userAnswer: string) => {
-    setIsEvaluating({...isEvaluating, [id]: true});
+  // Konuya göre ilgili soruları seçme işlevi
+  const getQuestionsByTopic = (topicTitle: string): Array<{id: string, question: string, answer: string, explanation: string}> => {
+    const lowerTitle = topicTitle.toLowerCase();
     
-    try {
-      const { data, error } = await supabase.functions.invoke('generate-simulation', {
-        body: { 
-          promptType: 'evaluateAnswer',
-          question: question,
-          userAnswer: userAnswer,
-          correctAnswer: derivativeQuestions.find(q => q.id === id)?.answer || ""
-        }
-      });
-
-      if (error) throw error;
-      
-      if (data && data.feedback) {
-        setUserFeedback({...userFeedback, [id]: data.feedback});
-      }
-    } catch (error) {
-      console.error("Yanıt değerlendirme hatası:", error);
-      toast({
-        title: "Hata",
-        description: "Yanıtınız değerlendirilirken bir sorun oluştu.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsEvaluating({...isEvaluating, [id]: false});
+    if (lowerTitle.includes("türev") || lowerTitle.includes("calculus") || lowerTitle.includes("matematik")) {
+      return derivativeQuestions;
+    } else if (lowerTitle.includes("fizik") || lowerTitle.includes("mekanik") || lowerTitle.includes("elektrik")) {
+      return physicsQuestions;
+    } else if (lowerTitle.includes("kimya") || lowerTitle.includes("element") || lowerTitle.includes("kimyasal")) {
+      return chemistryQuestions;
+    } else if (lowerTitle.includes("biyoloji") || lowerTitle.includes("hücre") || lowerTitle.includes("canlı")) {
+      return biologyQuestions;
     }
+    
+    // Varsayılan olarak türev sorularını döndür
+    return derivativeQuestions.slice(0, 5); // Varsayılan olarak ilk 5 türev sorusunu göster
   };
 
   if (isLoading) {
@@ -167,9 +273,9 @@ const SimulationDisplay: React.FC<SimulationDisplayProps> = ({ simulation, isLoa
     );
   }
 
-  // Eğer sorgu "türev" ile ilgiliyse ya da simulation null ise, türev özel içeriğini göster
-  if (!simulation || (simulation.title && simulation.title.toLowerCase().includes("türev"))) {
-    const derivativeSimulation = simulation || {
+  // Eğer simülasyon yoksa, türev özel içeriğini göster
+  if (!simulation) {
+    const derivativeSimulation = {
       title: "Türev Hesaplama: Değişim Oranını Anlamak",
       scenario: "Bir matematik öğrencisi olarak, türev kavramının derinliklerine iniyorsunuz. Önünüzde bir grafik var ve bu grafiğin her noktasındaki değişim oranını bulmak istiyorsunuz. İşte türevi anlamak ve hesaplamak için interaktif bir rehber.",
       steps: [
@@ -184,52 +290,6 @@ const SimulationDisplay: React.FC<SimulationDisplayProps> = ({ simulation, isLoa
         "Bir fonksiyonun maksimum ve minimum noktalarını bulmak için türev nasıl kullanılır?",
         "İkinci türev ne anlama gelir ve ne için kullanılır?",
         "Günlük hayatta türevin uygulamaları nelerdir?"
-      ],
-      interactiveElements: [
-        {
-          id: "power-rule",
-          type: "slider",
-          label: "Kuvvet Değeri (n)",
-          description: "x^n fonksiyonunun türevinin nasıl değiştiğini görün",
-          min: 1,
-          max: 10,
-          defaultValue: 2,
-          affects: "derivative-result",
-          feedback: {
-            "1": "f(x) = x için türev: 1 · x^0 = 1",
-            "2": "f(x) = x^2 için türev: 2 · x^1 = 2x",
-            "3": "f(x) = x^3 için türev: 3 · x^2 = 3x^2",
-            "4": "f(x) = x^4 için türev: 4 · x^3 = 4x^3",
-            "5": "f(x) = x^5 için türev: 5 · x^4 = 5x^4",
-            "6": "f(x) = x^6 için türev: 6 · x^5 = 6x^5",
-            "7": "f(x) = x^7 için türev: 7 · x^6 = 7x^6",
-            "8": "f(x) = x^8 için türev: 8 · x^7 = 8x^7",
-            "9": "f(x) = x^9 için türev: 9 · x^8 = 9x^8",
-            "10": "f(x) = x^10 için türev: 10 · x^9 = 10x^9"
-          }
-        },
-        {
-          id: "constant-multiplier",
-          type: "slider",
-          label: "Sabit Çarpan (a)",
-          description: "a·x^2 fonksiyonunun türevinin sabit çarpana göre değişimini görün",
-          min: 1,
-          max: 10,
-          defaultValue: 3,
-          affects: "derivative-constant",
-          feedback: {
-            "1": "f(x) = 1·x^2 için türev: 1 · 2x = 2x",
-            "2": "f(x) = 2·x^2 için türev: 2 · 2x = 4x",
-            "3": "f(x) = 3·x^2 için türev: 3 · 2x = 6x",
-            "4": "f(x) = 4·x^2 için türev: 4 · 2x = 8x",
-            "5": "f(x) = 5·x^2 için türev: 5 · 2x = 10x",
-            "6": "f(x) = 6·x^2 için türev: 6 · 2x = 12x",
-            "7": "f(x) = 7·x^2 için türev: 7 · 2x = 14x",
-            "8": "f(x) = 8·x^2 için türev: 8 · 2x = 16x",
-            "9": "f(x) = 9·x^2 için türev: 9 · 2x = 18x",
-            "10": "f(x) = 10·x^2 için türev: 10 · 2x = 20x"
-          }
-        }
       ]
     };
 
@@ -259,19 +319,6 @@ const SimulationDisplay: React.FC<SimulationDisplayProps> = ({ simulation, isLoa
             </div>
             
             <Separator className="my-6" />
-            
-            {derivativeSimulation.interactiveElements && derivativeSimulation.interactiveElements.length > 0 && (
-              <>
-                <div className="mb-6">
-                  <h4 className="text-lg font-semibold mb-3">Türev Kavramını Keşfedin</h4>
-                  <p className="text-slate-600 mb-4">
-                    Aşağıdaki kontrolleri kullanarak farklı fonksiyonların türevlerini inceleyin ve kuralları gözlemleyin.
-                  </p>
-                  <InteractiveElements elements={derivativeSimulation.interactiveElements} />
-                </div>
-                <Separator className="my-6" />
-              </>
-            )}
             
             <div className="mb-6">
               <h4 className="text-lg font-semibold mb-3">Türev Alıştırmaları</h4>
@@ -309,18 +356,14 @@ const SimulationDisplay: React.FC<SimulationDisplayProps> = ({ simulation, isLoa
                 ))}
               </ul>
             </div>
-            
-            {simulation && (
-              <div className="flex justify-center mt-8">
-                <Button className="mr-3" onClick={saveSimulation}>Simülasyonu Kaydet</Button>
-                <Button variant="outline">Paylaş</Button>
-              </div>
-            )}
           </div>
         </CardContent>
       </Card>
     );
   }
+
+  // Simülasyon başlık ve konusuna göre uygun soruları seç
+  const topicQuestions = getQuestionsByTopic(simulation.title);
 
   // Normal simülasyon gösterimi
   return (
@@ -350,12 +393,26 @@ const SimulationDisplay: React.FC<SimulationDisplayProps> = ({ simulation, isLoa
           
           <Separator className="my-6" />
           
-          {simulation.interactiveElements && simulation.interactiveElements.length > 0 && (
-            <>
-              <InteractiveElements elements={simulation.interactiveElements} />
-              <Separator className="my-6" />
-            </>
-          )}
+          <div className="mb-6">
+            <h4 className="text-lg font-semibold mb-3">Konuyla İlgili Alıştırmalar</h4>
+            <p className="text-slate-600 mb-4">
+              Aşağıdaki soruların yanıtlarını görebilmek için "Doğru Yanıtı Göster" butonuna tıklayın.
+            </p>
+            
+            <div className="space-y-4">
+              {topicQuestions.map((question) => (
+                <InteractiveQuestion 
+                  key={question.id}
+                  id={question.id}
+                  question={question.question}
+                  answer={question.answer}
+                  explanation={question.explanation}
+                />
+              ))}
+            </div>
+          </div>
+          
+          <Separator className="my-6" />
           
           <div className="mb-6">
             <h4 className="text-lg font-semibold mb-2">Açıklama</h4>
