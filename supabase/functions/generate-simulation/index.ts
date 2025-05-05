@@ -16,8 +16,66 @@ serve(async (req) => {
   }
 
   try {
-    const { prompt } = await req.json();
+    const requestBody = await req.json();
+    const { prompt, promptType, question, userAnswer, correctAnswer } = requestBody;
     
+    // Cevap değerlendirmesi isteniyorsa
+    if (promptType === 'evaluateAnswer') {
+      const geminiPrompt = `
+        Lütfen yanıtını tamamen Türkçe olarak ver.
+        
+        Aşağıda bir matematik (türev) sorusu ve kullanıcının bu soruya verdiği yanıt bulunmaktadır:
+        
+        Soru: ${question}
+        Kullanıcının yanıtı: ${userAnswer}
+        Doğru yanıt: ${correctAnswer}
+        
+        Kullanıcının verdiği yanıtı değerlendir. Yanıt doğru mu, yoksa yanlış mı? Eğer doğruysa neden doğru olduğunu, yanlışsa neden yanlış olduğunu açıkla. Yanıtın sadece şekilsel olarak farklı yazılmış ancak matematiksel olarak eşdeğer olma ihtimalini de göz önünde bulundur (örneğin: 2x yerine 2*x yazılması gibi).
+        
+        Kullanıcıya yanıtının değerlendirmesi hakkında bilgi ver. Açıklamanda, türev alma kurallarını hatırlatarak eğitici bir yaklaşım sergile. Kısa ve öz olarak, matematiksel terimleri herkesin anlayabileceği şekilde açıklayarak yanıtını ver.
+        
+        Cevabını JSON formatında değil, düz metin olarak ver. Sadece değerlendirme metni döndür.
+      `;
+
+      const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-goog-api-key': geminiApiKey,
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                {
+                  text: geminiPrompt,
+                },
+              ],
+            },
+          ],
+        }),
+      });
+
+      const data = await response.json();
+      
+      // Extract text content from Gemini's response
+      if (!data.candidates || data.candidates.length === 0) {
+        throw new Error('No response from Gemini API');
+      }
+      
+      const content = data.candidates[0].content;
+      if (!content || !content.parts || content.parts.length === 0) {
+        throw new Error('Invalid response format from Gemini API');
+      }
+      
+      const feedbackText = content.parts[0].text;
+      
+      return new Response(JSON.stringify({ feedback: feedbackText }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    
+    // Normal simülasyon oluşturma isteği
     if (!prompt) {
       throw new Error('Prompt is required');
     }
@@ -58,6 +116,13 @@ serve(async (req) => {
       }
       
       Etkileşimli öğelerin kullanıcının kavramı anlamasına gerçekten yardımcı olduğuna emin ol, temel değişkenleri değiştirmelerine ve anında geri bildirim görmelerine izin vererek. En az 2 etkileşimli öğe dahil et. Simülasyon içerisinde kesinlikle sadece Türkçe dil kullan, hiçbir İngilizce kelime veya ifade olmasın.
+      
+      Eğer konu türev ile ilgiliyse, aşağıdaki konuları simülasyona dahil et:
+      - Türevin temel tanımı ve geometrik yorumu
+      - Sabit, kuvvet, toplam ve çarpım kuralı
+      - Temel fonksiyonların türevleri
+      - Pratik türev alma yöntemleri ve adımları
+      - En az 3 farklı türev sorusu ve çözümleri
     `;
 
     const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent', {
