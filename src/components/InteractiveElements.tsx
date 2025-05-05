@@ -12,11 +12,11 @@ const InteractiveElements: React.FC<InteractiveElementsProps> = ({ elements }) =
     return null;
   }
   
-  // Filter to only include questions
-  const questions = elements.filter(el => 
-    el.type === 'question' || 
-    (el.question && el.answer) // Support older format that might have question/answer props directly
-  );
+  // Filter to only include questions - now properly handling type checking
+  const questions = elements.filter(el => {
+    // Only include elements that have both question/label and answer/correctAnswer properties
+    return (el.label || el.description) && (el.feedback || el.description);
+  });
   
   // If no questions after filtering, show nothing
   if (questions.length === 0) {
@@ -30,9 +30,9 @@ const InteractiveElements: React.FC<InteractiveElementsProps> = ({ elements }) =
           <InteractiveQuestion
             key={element.id}
             id={element.id}
-            question={element.question || element.label || ''}
-            answer={element.answer || element.correctAnswer || ''}
-            explanation={element.explanation || ''}
+            question={element.label || element.description || ''}
+            answer={element.feedback?.['100'] || element.feedback?.['50'] || element.description || ''}
+            explanation={element.description || ''}
           />
         ))}
       </div>

@@ -90,11 +90,16 @@ serve(async (req) => {
       throw new Error('Prompt is required');
     }
 
+    // Konu tespiti yapıp, ona göre soru seti üretmeye yönelik parametre ekleme
+    const topicKeywords = analyzeTopicKeywords(prompt);
+    
     // Gemini için yanıt dilini Türkçe olarak belirten komut ekleme
     const geminiPrompt = `
       Lütfen yanıtını tamamen Türkçe olarak ver.
       
       Şu konu hakkında etkileşimli bir öğrenme simülasyonu oluştur: "${prompt}". 
+      
+      Bu konu ${topicKeywords.join(", ")} alanına giriyor. Simülasyonu ve tüm sorularını bu konu alanına özel olarak tasarla.
       
       Yanıtını aşağıdaki yapıda bir JSON nesnesi olarak formatla:
       {
@@ -105,35 +110,29 @@ serve(async (req) => {
         "questions": ["Düşündürücü soru 1", "Düşündürücü soru 2", ...],
         "interactiveElements": [
           {
-            "id": "benzersiz-id",
-            "type": "slider|button|toggle|input",
-            "label": "Kullanıcı dostu etiket",
-            "description": "Bu etkileşimli öğenin ne işe yaradığı",
-            "min": 0, (isteğe bağlı, kaydırıcılar için)
-            "max": 100, (isteğe bağlı, kaydırıcılar için)
-            "defaultValue": 50, (isteğe bağlı)
-            "options": ["seçenek1", "seçenek2"], (isteğe bağlı, seçim girişleri için)
-            "affects": "bu-neyi-değiştirir",
-            "feedback": {
-              "0": "Minimum değer için geri bildirim",
-              "25": "Düşük değer için geri bildirim",
-              "50": "Orta değer için geri bildirim",
-              "75": "Yüksek değer için geri bildirim",
-              "100": "Maksimum değer için geri bildirim"
-            }
-          }
+            "id": "soru-1",
+            "type": "question",
+            "question": "Konuyla ilgili soru 1",
+            "answer": "Doğru cevap 1",
+            "explanation": "Cevabın açıklaması 1" 
+          },
+          {
+            "id": "soru-2",
+            "type": "question",
+            "question": "Konuyla ilgili soru 2",
+            "answer": "Doğru cevap 2",
+            "explanation": "Cevabın açıklaması 2"
+          },
+          // En az 5-6 soru ekle
         ]
       }
       
-      Etkileşimli öğelerin kullanıcının kavramı anlamasına gerçekten yardımcı olduğuna emin ol, temel değişkenleri değiştirmelerine ve anında geri bildirim görmelerine izin vererek. En az 2 etkileşimli öğe dahil et. Simülasyon içerisinde kesinlikle sadece Türkçe dil kullan, hiçbir İngilizce kelime veya ifade olmasın.
+      Etkileşimli öğelerin kullanıcının kavramı anlamasına yardımcı olmalı. Simülasyon içerisinde kesinlikle sadece Türkçe dil kullan, hiçbir İngilizce kelime veya ifade olmasın.
       
-      Eğer konu türev ile ilgiliyse, aşağıdaki konuları simülasyona dahil et:
-      - Türevin temel tanımı ve geometrik yorumu
-      - Sabit, kuvvet, toplam ve çarpım kuralı
-      - Temel fonksiyonların türevleri
-      - Pratik türev alma yöntemleri ve adımları
-      - En az 3 farklı türev sorusu ve çözümleri
+      Tam olarak belirtilen JSON formatını kullan, özellikle "interactiveElements" dizisindeki her öğenin "id", "type", "question", "answer" ve "explanation" alanlarını içerdiğinden emin ol.
     `;
+
+    console.log("Gemini'ye gönderilen istek:", geminiPrompt);
 
     const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent', {
       method: 'POST',
@@ -155,6 +154,7 @@ serve(async (req) => {
     });
 
     const data = await response.json();
+    console.log("Gemini API yanıtı:", JSON.stringify(data));
     
     // Extract the JSON content from Gemini's response
     if (!data.candidates || data.candidates.length === 0) {
@@ -178,6 +178,23 @@ serve(async (req) => {
                         
       const jsonText = jsonMatch[1] || textContent;
       simulationData = JSON.parse(jsonText);
+      
+      // Interaktif elemanları, sorular için standardize et
+      if (simulationData.interactiveElements) {
+        simulationData.interactiveElements = simulationData.interactiveElements.map((element, index) => {
+          if (element.type === "question" || element.question) {
+            return {
+              id: element.id || `question-${index}`,
+              type: "question",
+              question: element.question,
+              answer: element.answer || element.correctAnswer,
+              explanation: element.explanation || ""
+            };
+          }
+          return element;
+        });
+      }
+      
     } catch (e) {
       console.error("Error parsing Gemini response:", e, textContent);
       throw new Error('Failed to parse simulation data from AI response');
@@ -194,3 +211,90 @@ serve(async (req) => {
     });
   }
 });
+
+// Konu analizi yardımcı fonksiyonu
+function analyzeTopicKeywords(prompt: string): string[] {
+  const lowercasePrompt = prompt.toLowerCase();
+  
+  const topics: string[] = [];
+  
+  // Matematik ile ilgili anahtar kelimeler
+  if (lowercasePrompt.includes("türev") || 
+      lowercasePrompt.includes("integral") || 
+      lowercasePrompt.includes("matematik") ||
+      lowercasePrompt.includes("fonksiyon") ||
+      lowercasePrompt.includes("cebir") ||
+      lowercasePrompt.includes("geometri") ||
+      lowercasePrompt.includes("sayı") ||
+      lowercasePrompt.includes("denklem") ||
+      lowercasePrompt.includes("aritmetik") ||
+      lowercasePrompt.includes("calculus")) {
+    topics.push("matematik");
+  }
+  
+  // Fizik ile ilgili anahtar kelimeler
+  if (lowercasePrompt.includes("fizik") || 
+      lowercasePrompt.includes("mekanik") || 
+      lowercasePrompt.includes("elektrik") ||
+      lowercasePrompt.includes("manyetik") ||
+      lowercasePrompt.includes("hareket") ||
+      lowercasePrompt.includes("kuvvet") ||
+      lowercasePrompt.includes("enerji") ||
+      lowercasePrompt.includes("dalga") ||
+      lowercasePrompt.includes("Newton") ||
+      lowercasePrompt.includes("ivme") ||
+      lowercasePrompt.includes("optik")) {
+    topics.push("fizik");
+  }
+  
+  // Kimya ile ilgili anahtar kelimeler
+  if (lowercasePrompt.includes("kimya") || 
+      lowercasePrompt.includes("element") || 
+      lowercasePrompt.includes("kimyasal") ||
+      lowercasePrompt.includes("molekül") ||
+      lowercasePrompt.includes("periyodik") ||
+      lowercasePrompt.includes("reaksiyon") ||
+      lowercasePrompt.includes("asit") ||
+      lowercasePrompt.includes("baz") ||
+      lowercasePrompt.includes("atom") ||
+      lowercasePrompt.includes("bileşik")) {
+    topics.push("kimya");
+  }
+  
+  // Biyoloji ile ilgili anahtar kelimeler
+  if (lowercasePrompt.includes("biyoloji") || 
+      lowercasePrompt.includes("hücre") || 
+      lowercasePrompt.includes("canlı") ||
+      lowercasePrompt.includes("gen") ||
+      lowercasePrompt.includes("dna") ||
+      lowercasePrompt.includes("organizma") ||
+      lowercasePrompt.includes("evrim") ||
+      lowercasePrompt.includes("sistem") ||
+      lowercasePrompt.includes("organ") ||
+      lowercasePrompt.includes("kalıtım") ||
+      lowercasePrompt.includes("fotosentez")) {
+    topics.push("biyoloji");
+  }
+  
+  // Tarih ve Coğrafya ile ilgili anahtar kelimeler
+  if (lowercasePrompt.includes("tarih") || 
+      lowercasePrompt.includes("coğrafya") || 
+      lowercasePrompt.includes("ülke") ||
+      lowercasePrompt.includes("savaş") ||
+      lowercasePrompt.includes("imparatorluk") ||
+      lowercasePrompt.includes("devlet") ||
+      lowercasePrompt.includes("yeryüzü") ||
+      lowercasePrompt.includes("iklim") ||
+      lowercasePrompt.includes("kıta") ||
+      lowercasePrompt.includes("dağ") ||
+      lowercasePrompt.includes("deniz")) {
+    topics.push("tarih ve coğrafya");
+  }
+  
+  // Eğer hiçbir konu belirlenemezse genel olarak işaretleyelim
+  if (topics.length === 0) {
+    topics.push("genel");
+  }
+  
+  return topics;
+}
