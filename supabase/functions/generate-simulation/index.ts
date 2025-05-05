@@ -30,12 +30,14 @@ serve(async (req) => {
         Kullanıcının yanıtı: ${userAnswer}
         Doğru yanıt: ${correctAnswer}
         
-        Kullanıcının verdiği yanıtı değerlendir. Yanıt doğru mu, yoksa yanlış mı? Eğer doğruysa neden doğru olduğunu, yanlışsa neden yanlış olduğunu açıkla. Yanıtın sadece şekilsel olarak farklı yazılmış ancak matematiksel olarak eşdeğer olma ihtimalini de göz önünde bulundur (örneğin: 2x yerine 2*x yazılması gibi).
+        Kullanıcının verdiği yanıtı değerlendir. Bu değerlendirmede "doğru" veya "yanlış" kelimelerini kullanma. Bunun yerine yanıtın nasıl elde edildiğini ve doğru yanıtın nasıl bulunacağını açıkla. Yanıtın sadece şekilsel olarak farklı yazılmış ancak matematiksel olarak eşdeğer olma ihtimalini de göz önünde bulundur (örneğin: 2x yerine 2*x yazılması gibi).
         
         Kullanıcıya yanıtının değerlendirmesi hakkında bilgi ver. Açıklamanda, türev alma kurallarını hatırlatarak eğitici bir yaklaşım sergile. Kısa ve öz olarak, matematiksel terimleri herkesin anlayabileceği şekilde açıklayarak yanıtını ver.
         
         Cevabını JSON formatında değil, düz metin olarak ver. Sadece değerlendirme metni döndür.
       `;
+
+      console.log("Gemini'ye gönderilen istek:", geminiPrompt);
 
       const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent', {
         method: 'POST',
@@ -56,7 +58,14 @@ serve(async (req) => {
         }),
       });
 
+      if (!response.ok) {
+        const errorBody = await response.text();
+        console.error("Gemini API yanıt hatası:", response.status, errorBody);
+        throw new Error(`Gemini API error: ${response.status}`);
+      }
+
       const data = await response.json();
+      console.log("Gemini API yanıtı:", JSON.stringify(data));
       
       // Extract text content from Gemini's response
       if (!data.candidates || data.candidates.length === 0) {
@@ -69,6 +78,7 @@ serve(async (req) => {
       }
       
       const feedbackText = content.parts[0].text;
+      console.log("Oluşturulan geribildirim:", feedbackText);
       
       return new Response(JSON.stringify({ feedback: feedbackText }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

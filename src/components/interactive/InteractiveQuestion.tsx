@@ -41,6 +41,7 @@ const InteractiveQuestion: React.FC<InteractiveQuestionProps> = ({
     }
 
     setIsSubmitting(true);
+    setFeedback("Değerlendiriliyor...");
 
     try {
       // Eğer onUserAnswer prop'u geçilmişse, onu çağır
@@ -67,6 +68,7 @@ const InteractiveQuestion: React.FC<InteractiveQuestionProps> = ({
       }
     } catch (error) {
       console.error("Yanıt değerlendirme hatası:", error);
+      setFeedback("Yanıtınız değerlendirilirken bir sorun oluştu. Lütfen tekrar deneyin.");
       toast({
         title: "Hata",
         description: "Yanıtınız değerlendirilirken bir sorun oluştu.",
@@ -85,30 +87,28 @@ const InteractiveQuestion: React.FC<InteractiveQuestionProps> = ({
           
           {!showAnswer && !feedback ? (
             <div className="space-y-3">
-              {onUserAnswer && (
-                <div className="space-y-2">
-                  <Input
-                    value={userAnswer}
-                    onChange={(e) => setUserAnswer(e.target.value)}
-                    placeholder="Yanıtınızı buraya yazın..."
-                    className="w-full"
-                  />
-                  <Button 
-                    onClick={handleSubmitAnswer}
-                    disabled={isSubmitting}
-                    className="mt-2"
-                  >
-                    {isSubmitting ? "Değerlendiriliyor..." : "Yanıtı Gönder"}
-                  </Button>
-                </div>
-              )}
-              <Button 
-                variant="outline" 
-                onClick={handleShowAnswer}
-                className="mt-2"
-              >
-                Yanıtı Göster
-              </Button>
+              <div className="space-y-2">
+                <Input
+                  value={userAnswer}
+                  onChange={(e) => setUserAnswer(e.target.value)}
+                  placeholder="Yanıtınızı buraya yazın..."
+                  className="w-full"
+                />
+                <Button 
+                  onClick={handleSubmitAnswer}
+                  disabled={isSubmitting}
+                  className="mt-2"
+                >
+                  {isSubmitting ? "Değerlendiriliyor..." : "Yanıtı Gönder"}
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={handleShowAnswer}
+                  className="mt-2 ml-2"
+                >
+                  Doğru Yanıtı Göster
+                </Button>
+              </div>
             </div>
           ) : (
             <div className="mt-3 p-3 bg-white border border-slate-200 rounded-md">
@@ -116,6 +116,15 @@ const InteractiveQuestion: React.FC<InteractiveQuestionProps> = ({
                 <>
                   <p className="font-medium text-slate-900">Yanıtınızın Değerlendirmesi:</p>
                   <p className="text-slate-700 whitespace-pre-line">{feedback}</p>
+                  {!showAnswer && (
+                    <Button 
+                      variant="outline" 
+                      onClick={handleShowAnswer}
+                      className="mt-2"
+                    >
+                      Doğru Yanıtı Göster
+                    </Button>
+                  )}
                 </>
               ) : (
                 <>
