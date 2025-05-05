@@ -21,7 +21,7 @@ const SavedSimulations = () => {
       id: '2', 
       title: 'The Water Cycle Process', 
       date: '2024-05-01',
-      description: 'Exploring how water moves through the Earth's systems in a continuous cycle.'
+      description: 'Exploring how water moves through the Earth\'s systems in a continuous cycle.'
     },
     { 
       id: '3', 
