@@ -28,16 +28,38 @@ const InteractiveInput: React.FC<InteractiveInputProps> = ({
     e.preventDefault();
     
     // Cevabı kontrol et
-    if (feedback[value.toLowerCase()]) {
-      setCurrentFeedback(feedback[value.toLowerCase()]);
-      setIsCorrect(feedback[value.toLowerCase()].includes('Doğru') || 
-                   feedback[value.toLowerCase()].includes('doğru') || 
-                   !feedback[value.toLowerCase()].includes('Yanlış') && 
-                   !feedback[value.toLowerCase()].includes('yanlış'));
-    } else {
-      // Eşleşme yoksa varsayılan geri bildirim
-      setCurrentFeedback(feedback['default'] || 'Başka bir cevap deneyin.');
-      setIsCorrect(false);
+    // Önce tam eşleşme kontrol et
+    if (feedback[value.toLowerCase().trim()]) {
+      setCurrentFeedback(feedback[value.toLowerCase().trim()]);
+      setIsCorrect(
+        feedback[value.toLowerCase().trim()].includes('Doğru') || 
+        feedback[value.toLowerCase().trim()].includes('doğru') || 
+        (!feedback[value.toLowerCase().trim()].includes('Yanlış') && 
+         !feedback[value.toLowerCase().trim()].includes('yanlış'))
+      );
+    } 
+    // Doğru cevapların olduğu bir listede kontrol et (bazı matematik soruları için alternatif yazımları desteklemek için)
+    else {
+      const correctAnswers = Object.keys(feedback).filter(key => 
+        feedback[key].includes('Doğru') || 
+        feedback[key].includes('doğru') ||
+        (!feedback[key].includes('Yanlış') && !feedback[key].includes('yanlış'))
+      );
+      
+      // Kullanıcının yanıtını doğru yanıtlarla karşılaştır (boşlukları ve büyük/küçük harfleri göz ardı ederek)
+      const isAnswerCorrect = correctAnswers.some(answer => 
+        value.toLowerCase().trim() === answer.toLowerCase().trim() ||
+        value.toLowerCase().trim().replace(/\s+/g, '') === answer.toLowerCase().trim().replace(/\s+/g, '')
+      );
+      
+      if (isAnswerCorrect && correctAnswers.length > 0) {
+        setCurrentFeedback(feedback[correctAnswers[0]]);
+        setIsCorrect(true);
+      } else {
+        // Eşleşme yoksa varsayılan geri bildirim
+        setCurrentFeedback(feedback['default'] || 'Başka bir cevap deneyin.');
+        setIsCorrect(false);
+      }
     }
     
     if (onSubmit) {
