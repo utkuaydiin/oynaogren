@@ -1,6 +1,7 @@
 
 import { generateSimulationWithGemini, SimulationData } from './geminiService';
 import { supabase } from '@/integrations/supabase/client';
+import { Json } from '@/integrations/supabase/types';
 
 export interface SimulationResult extends SimulationData {}
 
@@ -16,10 +17,13 @@ export const generateSimulation = async (prompt: string): Promise<SimulationResu
 
 export const saveSimulation = async (simulation: SimulationData, userId: string) => {
   try {
+    // SimulationData'yı Json olarak işlem görecek şekilde dönüştür
+    const simulationJson = JSON.parse(JSON.stringify(simulation)) as Json;
+    
     const { data, error } = await supabase.from('simulations').insert({
       title: simulation.title,
       description: simulation.scenario,
-      content: simulation,
+      content: simulationJson,
       user_id: userId
     });
 

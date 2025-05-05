@@ -34,7 +34,8 @@ const SimulationDetail = () => {
         if (error) throw error;
         if (!data) throw new Error("Simülasyon bulunamadı");
 
-        setSimulation(data.content);
+        // Veritabanından gelen JSON verisini SimulationData tipine dönüştür
+        setSimulation(data.content as unknown as SimulationData);
       } catch (error: any) {
         toast({
           title: "Hata",

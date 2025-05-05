@@ -8,6 +8,7 @@ import { SimulationData } from '@/services/geminiService';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { Json } from '@/integrations/supabase/types';
 
 interface SimulationDisplayProps {
   simulation: SimulationData | null;
@@ -49,10 +50,13 @@ const SimulationDisplay: React.FC<SimulationDisplayProps> = ({ simulation, isLoa
     if (!simulation) return;
 
     try {
+      // SimulationData'yı Json olarak işlem görecek şekilde dönüştür
+      const simulationJson = JSON.parse(JSON.stringify(simulation)) as Json;
+      
       const { data, error } = await supabase.from('simulations').insert({
         title: simulation.title,
         description: simulation.scenario,
-        content: simulation,
+        content: simulationJson,
         user_id: user.id
       });
 
